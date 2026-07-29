@@ -25,6 +25,66 @@ const adapters: SourceAdapter[] = [olx, dimria, rieltor];
 // while avoiding a burst of parallel page fetches.
 const REQUEST_DELAY_MS = 400;
 const MAX_PAGES_SAFETY_LIMIT = 200;
+const BATCH_MAX_PAGES = 5;
+const BATCH_TIMEOUT_MS = 45_000;
+const PAGE_TIMEOUT_MS = 8_000;
+
+export interface SourceBatchResult {
+  ok: true;
+  source: SourceName;
+  listings: Listing[];
+  fetchedPages: number[];
+  nextPage: number;
+  hasMore: boolean;
+  reportedTotal?: number;
+  warnings: string[];
+}
+
+export function getSourceAdapter(source: SourceName): SourceAdapter {
+  const adapter = adapters.find(item => item.source === source);
+  if (!adapter) throw new Error(`Unsupported source: ${source}`);
+  return adapter;
+}
+
+export async function searchSourceBatch(source: SourceName, params: SearchListingsParams, sourcePage = 1, sourcePageSize = 3): Promise<SourceBatchResult> {
+  const adapter = getSourceAdapter(source);
+  const startPage = Math.max(1, Math.floor(sourcePage));
+  const pageCount = Math.max(1, Math.min(BATCH_MAX_PAGES, Math.floor(sourcePageSize)));
+  const controller = new AbortController();
+  const deadline = Date.now() + BATCH_TIMEOUT_MS;
+  const stopTimer = setTimeout(() => controller.abort(), BATCH_TIMEOUT_MS);
+  const listings: Listing[] = [];
+  const fetchedPages: number[] = [];
+  const warnings: string[] = [];
+  let nextPage = startPage;
+  let hasMore = true;
+  let reportedTotal: number | undefined;
+  let priorSignature: string | undefined;
+  try {
+    for (let index = 0; index < pageCount; index++) {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) { warnings.push("Внутренний лимит времени поиска исчерпан"); break; }
+      const page = startPage + index;
+      try {
+        const result = adapter.searchPage
+          ? await adapter.searchPage({ ...params, page, signal: controller.signal, requestTimeoutMs: Math.min(PAGE_TIMEOUT_MS, remaining) })
+          : { listings: await adapter.search({ ...params, page, signal: controller.signal, requestTimeoutMs: Math.min(PAGE_TIMEOUT_MS, remaining) }) };
+        if (result.reportedTotal !== undefined) reportedTotal = result.reportedTotal;
+        const signature = result.listings.map(dedupeKey).sort().join("|");
+        if (!result.listings.length || signature === priorSignature) { hasMore = false; break; }
+        priorSignature = signature;
+        listings.push(...result.listings);
+        fetchedPages.push(page);
+        nextPage = page + 1;
+        if (index < pageCount - 1) await delay(400);
+      } catch (error) {
+        warnings.push(`Страница ${page}: ${error instanceof Error ? error.message : String(error)}`);
+        break;
+      }
+    }
+  } finally { clearTimeout(stopTimer); }
+  return { ok: true, source, listings, fetchedPages, nextPage, hasMore, reportedTotal, warnings };
+}
 
 function dedupeKey(listing: Listing): string {
   return listing.sourceId ? `id:${listing.sourceId}` : `url:${listing.listingUrl}`;

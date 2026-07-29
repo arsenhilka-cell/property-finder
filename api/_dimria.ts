@@ -12,7 +12,7 @@ export const dimria: SourceAdapter = {
     return url.href;
   },
   async search(params) {
-    const url = this.buildSearchUrl(params); const html = await fetchText(url, `dimria-search-p${params.page || 1}`);
+    const url = this.buildSearchUrl(params); const html = await fetchText(url, `dimria-search-p${params.page || 1}`, { signal: params.signal, timeoutMs: params.requestTimeoutMs });
     const output: Listing[] = []; const seen = new Set<string>();
     // Detail links are stable; card markup changes frequently, so take the nearby card text conservatively.
     for (const m of html.matchAll(/<a[^>]+href=["']([^"']*(?:arenda|prodazha)-[^"']*\d+[^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi)) {

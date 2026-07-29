@@ -14,6 +14,7 @@
 
 - Поиск коммерческой недвижимости по городу, операции, цене и площади.
 - Источники: OLX, DIM.RIA, RIELTOR.
+- Пакетный поиск: frontend параллельно запрашивает источники, а каждый API-вызов обходит до 5 страниц (по умолчанию 3). Это не даёт serverless-функции Vercel превысить лимит времени.
 - Нормализация объявлений, дедупликация в рамках источника и частичные результаты при сбое одного из сайтов.
 - Сортировка и клиентская пагинация по 50 карточек.
 - Отправка карточки с комментарием в Telegram: `sendPhoto` с автоматическим fallback на `sendMessage`.
@@ -22,12 +23,15 @@
 ## Структура проекта
 
 ```text
-src/
-  server.ts             HTTP-сервер и API endpoints
-  search-listings.ts    единый сервис поиска
-  sources/              адаптеры OLX, DIM.RIA и RIELTOR
-  utils/http.ts         HTTP-клиент, таймауты и задержки
-  types.ts              общие TypeScript-типы
+api/
+  [...path].ts          единственный Vercel serverless entrypoint
+  _app.ts               API routes
+  _search.ts            пакетный поиск и общий сервис для CLI
+  _olx.ts               адаптер OLX
+  _dimria.ts            адаптер DIM.RIA
+  _rieltor.ts           адаптер RIELTOR
+scripts/
+  local-server.ts       локальный Node HTTP adapter для API и public/
 public/
   index.html            страница поиска
   app.js                клиентская логика
@@ -71,6 +75,8 @@ npm start
 ## Деплой на Vercel
 
 Vercel автоматически обнаруживает catch-all функцию `api/[...path].ts` и направляет в неё все существующие API routes. Локальный `node:http` сервер находится в `scripts/local-server.ts` и не является частью serverless deployment. Статические файлы из `public/` Vercel отдаёт без дополнительной конфигурации.
+
+Поиск использует три endpoint'а: `POST /api/search/olx`, `POST /api/search/dimria` и `POST /api/search/rieltor`. В body передаются обычные фильтры плюс `sourcePage` и `sourcePageSize`; последний по умолчанию равен 3 и ограничен 5. Каждый ответ возвращает только лёгкие поля карточек, `fetchedPages`, `nextPage`, `hasMore`, `warnings` и, когда источник сообщает его, `reportedTotal`.
 
 В настройках проекта Vercel добавьте те же Environment Variables, что перечислены в `.env.example`. Значения секретов не должны попадать в Git.
 

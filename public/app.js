@@ -1,6 +1,7 @@
 const pageSize = 50;
 let listings = [];
 let page = 1;
+let activeSearch = null;
 const form = document.querySelector('#search-form');
 const cards = document.querySelector('#cards');
 const summary = document.querySelector('#summary');
@@ -9,6 +10,8 @@ const notice = document.querySelector('#notice');
 const pagination = document.querySelector('#pagination');
 const sort = document.querySelector('#sort');
 const submit = form.querySelector('button');
+const stopSearch = document.querySelector('#stop-search');
+const progress = document.querySelector('#search-progress');
 const sendDialog = document.querySelector('#send-dialog');
 const sendForm = document.querySelector('#send-form');
 const sendTitle = document.querySelector('#send-title');
@@ -65,6 +68,55 @@ function render() {
 
 function showNotice(text, type = '') { notice.textContent = text; notice.className = text ? `notice ${type}` : ''; }
 
+async function readJsonResponse(response) {
+  const text = await response.text();
+  let body;
+  try { body = text ? JSON.parse(text) : {}; }
+  catch { throw new Error(`HTTP ${response.status}: ${text.slice(0, 180) || 'сервер вернул не-JSON ответ'}`); }
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${body.error || body.message || 'ошибка запроса'}`);
+  return body;
+}
+
+function listingKey(listing) { return `${listing.source}:${listing.sourceId || listing.listingUrl}`; }
+
+function renderProgress(state) {
+  progress.replaceChildren(...Object.entries(state.sources).map(([source, item]) => {
+    const row = document.createElement('div');
+    const status = item.error ? `ошибка: ${item.error}` : item.warning ? `предупреждение: ${item.warning}` : item.done ? 'готово' : 'загружаем...';
+    row.className = `progress-item ${item.error ? 'error' : item.done ? 'done' : 'loading'}`;
+    row.textContent = `${sourceLabel[source]}: ${item.count} найдено, ${status}`;
+    return row;
+  }));
+  counts.replaceChildren(...Object.entries(state.sources).map(([source, item]) => { const tag = document.createElement('span'); tag.className = 'count'; tag.textContent = `${sourceLabel[source]} ${item.count}`; return tag; }));
+  summary.textContent = `Найдено: ${listings.length}`;
+}
+
+async function loadSource(source, payload, state, listingMap) {
+  const item = state.sources[source];
+  while (!state.stopped && item.hasMore) {
+    try {
+      const response = await fetch(`/api/search/${source}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...payload, sourcePage: item.nextPage, sourcePageSize: 3 }) });
+      const result = await readJsonResponse(response);
+      for (const listing of result.listings || []) listingMap.set(listingKey(listing), listing);
+      listings = [...listingMap.values()];
+      item.count = [...listingMap.values()].filter(listing => listing.source === source).length;
+      item.nextPage = result.nextPage;
+      item.hasMore = result.hasMore;
+      if (result.warnings?.length) item.warning = result.warnings.join(' ');
+      if (!item.hasMore) item.done = true;
+      page = 1;
+      renderProgress(state); render();
+    } catch (error) {
+      item.error = error.message;
+      item.done = true;
+      item.hasMore = false;
+      renderProgress(state);
+      showNotice(`Часть источников недоступна. ${sourceLabel[source]}: ${error.message}`, 'warning');
+    }
+  }
+  if (state.stopped && !item.done) { item.done = true; item.warning = 'поиск остановлен'; renderProgress(state); }
+}
+
 function openSendDialog(listing, mode, sheetsButton = null) {
   selectedListing = listing;
   sendMode = mode;
@@ -83,25 +135,23 @@ function closeSendDialog() {
   activeSheetsButton = null;
 }
 
-form.addEventListener('submit', async event => {
+form.addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(form);
   const payload = Object.fromEntries(['city', 'operation', 'minPrice', 'maxPrice', 'minArea', 'maxArea'].map(key => [key, data.get(key) || undefined]));
-  payload.sources = data.getAll('sources');
-  submit.disabled = true; showNotice('Ищем объявления...', 'loading'); cards.replaceChildren(); pagination.replaceChildren();
-  try {
-    const response = await fetch('/api/search', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || 'Search failed');
-    listings = result.listings; page = 1;
-    summary.textContent = `Найдено: ${listings.length}`;
-    counts.replaceChildren(...Object.entries(result.counts).filter(([source]) => payload.sources.includes(source)).map(([source, count]) => { const tag = document.createElement('span'); tag.className = 'count'; tag.textContent = `${sourceLabel[source]} ${count}`; return tag; }));
-    const failed = Object.entries(result.errors);
-    showNotice(failed.length ? `Часть источников недоступна: ${failed.map(([source]) => sourceLabel[source]).join(', ')}. Показаны результаты остальных.` : '');
-    render();
-  } catch (error) { showNotice(`Не удалось выполнить поиск: ${error.message}`, 'error'); }
-  finally { submit.disabled = false; }
+  const selected = data.getAll('sources');
+  if (!selected.length) { showNotice('Выберите хотя бы один источник', 'error'); return; }
+  const state = { stopped: false, sources: Object.fromEntries(selected.map(source => [source, { count: 0, nextPage: 1, hasMore: true, done: false }])) };
+  activeSearch = state; listings = []; page = 1; cards.replaceChildren(); pagination.replaceChildren();
+  submit.disabled = true; stopSearch.disabled = false; showNotice('Ищем объявления...', 'loading'); renderProgress(state);
+  const listingMap = new Map();
+  Promise.all(selected.map(source => loadSource(source, payload, state, listingMap))).then(() => {
+    if (activeSearch !== state) return;
+    submit.disabled = false; stopSearch.disabled = true;
+    if (!state.stopped) showNotice('Поиск завершён');
+  });
 });
+stopSearch.addEventListener('click', () => { if (activeSearch) { activeSearch.stopped = true; stopSearch.disabled = true; showNotice('Останавливаем поиск после текущих пакетов...', 'warning'); } });
 sort.addEventListener('change', () => { page = 1; render(); });
 sendDialog.querySelector('[data-cancel]').addEventListener('click', closeSendDialog);
 sendDialog.querySelector('.icon-close').addEventListener('click', closeSendDialog);
@@ -112,8 +162,8 @@ sendForm.addEventListener('submit', async event => {
   try {
     const endpoint = sendMode === 'telegram' ? '/api/telegram' : '/api/sheets';
     const response = await fetch(endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ listing: selectedListing, comment: sendForm.elements.comment.value }) });
-    const result = await response.json();
-    if (!response.ok || !result.ok) throw new Error(result.error || 'Сервис не принял запрос');
+    const result = await readJsonResponse(response);
+    if (!result.ok) throw new Error(result.error || 'Сервис не принял запрос');
     const mode = sendMode;
     const sheetsButton = activeSheetsButton;
     closeSendDialog();

@@ -6,6 +6,8 @@ export interface SearchParams {
   minArea?: number;
   maxArea?: number;
   page?: number;
+  signal?: AbortSignal;
+  requestTimeoutMs?: number;
 }
 
 export interface Listing {
@@ -40,5 +42,6 @@ export interface SourceAdapter {
   source: SourceName;
   buildSearchUrl(params: SearchParams): string;
   search(params: SearchParams): Promise<Listing[]>;
+  searchPage?(params: SearchParams): Promise<{ listings: Listing[]; reportedTotal?: number }>;
   getDetail?(listing: Listing): Promise<Listing | undefined>;
 }

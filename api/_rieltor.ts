@@ -15,7 +15,7 @@ export const rieltor: SourceAdapter = {
     return url.href;
   },
   async search(params) {
-    const url = this.buildSearchUrl(params); const html = await fetchText(url, `rieltor-search-p${params.page || 1}`);
+    const url = this.buildSearchUrl(params); const html = await fetchText(url, `rieltor-search-p${params.page || 1}`, { signal: params.signal, timeoutMs: params.requestTimeoutMs });
     const output: Listing[] = [];
     const starts = [...html.matchAll(/<div class=["']catalog-card\s[^"']*["'][^>]*>/gi)].map(x => x.index!);
     for (const [i, start] of starts.entries()) {

@@ -14,6 +14,11 @@ export interface OlxParseDiagnostics {
   scriptsContainingListingIds: number;
 }
 
+function reportedTotal(html: string): number | undefined {
+  const match = /Ми знайшли\s+([\d\s]+)\s+оголошен/i.exec(htmlText(html));
+  return match ? Number(match[1].replace(/\s/g, "")) : undefined;
+}
+
 export function parseOlxSearchHtml(html: string, params: SearchParams): { listings: Listing[]; diagnostics: OlxParseDiagnostics } {
   const seen = new Set<string>(); const listings: Listing[] = [];
   const starts = [...html.matchAll(/<div[^>]+data-cy=["']l-card["'][^>]*>/gi)].map(x => x.index!);
@@ -66,10 +71,13 @@ export const olx: SourceAdapter = {
     if (params.maxArea !== undefined) url.searchParams.set("search[filter_float_total_area:to]", String(params.maxArea));
     return url.href;
   },
-  async search(params) {
+  async searchPage(params) {
     const url = this.buildSearchUrl(params);
-    const html = await fetchText(url, `olx-search-p${params.page || 1}`);
-    return parseOlxSearchHtml(html, params).listings;
+    const html = await fetchText(url, `olx-search-p${params.page || 1}`, { signal: params.signal, timeoutMs: params.requestTimeoutMs });
+    return { listings: parseOlxSearchHtml(html, params).listings, reportedTotal: reportedTotal(html) };
+  },
+  async search(params) {
+    return (await this.searchPage!(params)).listings;
   },
   async getDetail(listing) {
     const html = await fetchText(listing.listingUrl, "olx-detail");

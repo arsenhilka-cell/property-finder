@@ -19,12 +19,13 @@
           <div class="field-pair"><label>Цена от <input type="number" name="minPrice" min="0" placeholder="грн" /></label><label>Цена до <input type="number" name="maxPrice" min="0" value="60000" placeholder="грн" /></label></div>
           <div class="field-pair"><label>Площадь от <input type="number" name="minArea" min="0" value="30" placeholder="м²" /></label><label>Площадь до <input type="number" name="maxArea" min="0" value="100" placeholder="м²" /></label></div>
           <fieldset><legend>Источники</legend><label class="check"><input type="checkbox" name="sources" value="olx" checked /> OLX</label><label class="check"><input type="checkbox" name="sources" value="dimria" checked /> DIM.RIA</label><label class="check"><input type="checkbox" name="sources" value="rieltor" checked /> RIELTOR</label></fieldset>
-          <button type="submit">Найти</button>
+          <button type="submit">Найти</button><button id="stop-search" class="secondary" type="button" disabled>Остановить поиск</button>
         </form>
       </aside>
       <section class="results">
         <div class="results-top"><div><h2>Объявления</h2><p id="summary" class="muted">Укажите параметры и начните поиск.</p></div><label class="sort-label">Сортировка<select id="sort"><option value="newest">Сначала новые</option><option value="price-asc">Цена: по возрастанию</option><option value="price-desc">Цена: по убыванию</option><option value="area-asc">Площадь: по возрастанию</option><option value="area-desc">Площадь: по убыванию</option></select></label></div>
         <div id="source-counts" class="source-counts"></div>
+        <div id="search-progress" class="search-progress" aria-live="polite"></div>
         <div id="notice" role="status"></div>
         <div id="cards" class="cards"></div>
         <nav id="pagination" class="pagination" aria-label="Сторінки результатів"></nav>

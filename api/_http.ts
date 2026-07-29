@@ -10,9 +10,12 @@ export function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function fetchText(url: string, label: string): Promise<string> {
+export async function fetchText(url: string, label: string, options: { signal?: AbortSignal; timeoutMs?: number } = {}): Promise<string> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), HTTP_TIMEOUT_MS);
+  const timeoutMs = Math.min(options.timeoutMs ?? HTTP_TIMEOUT_MS, HTTP_TIMEOUT_MS);
+  const onAbort = () => controller.abort();
+  options.signal?.addEventListener("abort", onAbort, { once: true });
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   let hardTimeout: ReturnType<typeof setTimeout> | undefined;
   const request = fetch(url, {
     redirect: "follow",
@@ -24,11 +27,12 @@ export async function fetchText(url: string, label: string): Promise<string> {
     },
   });
   const hardTimeoutPromise = new Promise<never>((_, reject) => {
-    hardTimeout = setTimeout(() => reject(new Error(`HTTP timeout after ${HTTP_TIMEOUT_MS}ms: ${url}`)), HTTP_TIMEOUT_MS + 100);
+    hardTimeout = setTimeout(() => reject(new Error(`HTTP timeout after ${timeoutMs}ms: ${url}`)), timeoutMs + 100);
   });
   const response = await Promise.race([request, hardTimeoutPromise]).finally(() => {
     clearTimeout(timeout);
     if (hardTimeout) clearTimeout(hardTimeout);
+    options.signal?.removeEventListener("abort", onAbort);
   });
   const body = await response.text();
   statuses.push({ url: response.url, status: response.status, redirected: response.redirected,

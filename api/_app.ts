@@ -1,4 +1,4 @@
-import { searchListings, type SearchListingsParams } from "./_search.js";
+import { searchSourceBatch, type SearchListingsParams } from "./_search.js";
 import type { Listing, SourceName } from "./_types.js";
 
 const sourceNames: SourceName[] = ["olx", "dimria", "rieltor"];
@@ -25,8 +25,17 @@ function parseParams(value: unknown): SearchListingsParams {
     minArea: numberValue(body.minArea), maxArea: numberValue(body.maxArea) };
 }
 
+function batchNumber(value: unknown, fallback: number, maximum: number): number {
+  const number = Number(value);
+  return Number.isInteger(number) && number > 0 ? Math.min(number, maximum) : fallback;
+}
+
 function normalized(listing: Listing): Listing {
-  return { ...listing, pricePerM2: listing.pricePerM2 ?? (listing.price && listing.area ? listing.price / listing.area : undefined) };
+  const { description: _description, ...lightweightListing } = listing;
+  return {
+    ...lightweightListing,
+    pricePerM2: listing.pricePerM2 ?? (listing.price && listing.area ? listing.price / listing.area : undefined),
+  };
 }
 
 function inputListing(value: unknown): Listing {
@@ -89,9 +98,11 @@ export async function handleApiRequest(request: Request): Promise<Response> {
   try {
     if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
     const body = await request.json() as Record<string, unknown>;
-    if (pathname === "/api/search") {
-      const result = await searchListings(parseParams(body));
-      return json({ listings: result.listings.map(normalized), counts: Object.fromEntries(sourceNames.map(source => [source, result.bySource[source].length])), errors: result.errors });
+    if (pathname === "/api/search") return json({ error: "Use /api/search/olx, /api/search/dimria or /api/search/rieltor" }, 410);
+    const source = /^\/api\/search\/(olx|dimria|rieltor)$/.exec(pathname)?.[1] as SourceName | undefined;
+    if (source) {
+      const result = await searchSourceBatch(source, parseParams(body), batchNumber(body.sourcePage, 1, 10_000), batchNumber(body.sourcePageSize, 3, 5));
+      return json({ ...result, listings: result.listings.map(normalized) });
     }
     const listing = inputListing(body.listing);
     const comment = typeof body.comment === "string" ? body.comment.trim().slice(0, 2_000) : "";
