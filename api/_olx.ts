@@ -1,5 +1,6 @@
 import type { Listing, SearchParams, SourceAdapter } from "./_types.js";
 import { absolute, fetchText, htmlText, jsonLd, numberFrom } from "./_http.js";
+import { cityFromText } from "./_cities.js";
 
 const BASE = "https://www.olx.ua";
 
@@ -47,9 +48,13 @@ export function parseOlxSearchHtml(html: string, params: SearchParams): { listin
     const price = numberFrom(priceMatch?.[1]); const area = numberFrom(areaMatch?.[1]);
     if (price === undefined) diagnostics.missingPrice++;
     if (area === undefined) diagnostics.missingArea++;
+    const location = allText.match(/(?:Київ|Одеса|Харків|Дніпро|Запоріжжя|Львів|Вінниця|Полтава|Черкаси)[^\n]{0,90}/i)?.[0]?.trim();
+    // Only the explicit location line belongs to this card. `allText` also
+    // contains page navigation/footer text, which must never assign a city.
+    const actualCity = cityFromText(location || "");
     listings.push({ source: "olx", sourceId: /-(ID[\w-]+)\.html/i.exec(listingUrl)?.[1], title,
-      price, currency: priceMatch?.[2], area, city: params.city.labelRu,
-      location: allText.match(/Одеса,\s*[^-<]{0,80}/i)?.[0]?.trim(),
+      price, currency: priceMatch?.[2], area, city: actualCity?.labelRu,
+      location,
       imageUrl: absolute(BASE, /<img[^>]+src=["']([^"']+)/i.exec(fragment)?.[1]), listingUrl });
   }
   diagnostics.listings = listings.length;
@@ -75,7 +80,12 @@ export const olx: SourceAdapter = {
   async searchPage(params) {
     const url = this.buildSearchUrl(params);
     const html = await fetchText(url, `olx-search-p${params.page || 1}`, { signal: params.signal, timeoutMs: params.requestTimeoutMs });
-    return { listings: parseOlxSearchHtml(html, params).listings, reportedTotal: reportedTotal(html) };
+    const parsed = parseOlxSearchHtml(html, params);
+    return {
+      listings: parsed.listings,
+      reportedTotal: reportedTotal(html),
+      diagnostics: { rawCards: parsed.diagnostics.rawCards, parsedCards: parsed.diagnostics.listings },
+    };
   },
   async search(params) {
     return (await this.searchPage!(params)).listings;

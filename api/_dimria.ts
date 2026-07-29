@@ -1,5 +1,6 @@
 import type { Listing, SearchParams, SourceAdapter } from "./_types.js";
 import { absolute, fetchText, htmlText, jsonLd, numberFrom } from "./_http.js";
+import { cityFromText } from "./_cities.js";
 
 const BASE = "https://dom.ria.com";
 export const dimria: SourceAdapter = {
@@ -14,19 +15,27 @@ export const dimria: SourceAdapter = {
     // centrally after parsing known card values.
     return url.href;
   },
-  async search(params) {
+  async searchPage(params) {
     const url = this.buildSearchUrl(params); const html = await fetchText(url, `dimria-search-p${params.page || 1}`, { signal: params.signal, timeoutMs: params.requestTimeoutMs });
     const output: Listing[] = []; const seen = new Set<string>();
     // Detail links are stable; card markup changes frequently, so take the nearby card text conservatively.
-    for (const m of html.matchAll(/<a[^>]+href=["']([^"']*(?:arenda|prodazha)-[^"']*\d+[^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi)) {
+    const matches = [...html.matchAll(/<a[^>]+href=["']([^"']*(?:arenda|prodazha)-[^"']*\d+[^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi)];
+    for (const m of matches) {
       const listingUrl = absolute(BASE, m[1]); if (!listingUrl || seen.has(listingUrl) || !/\.html|\d+\/?$/.test(listingUrl)) continue;
       const title = htmlText(m[2]); if (title.length < 8) continue;
       seen.add(listingUrl); const around = html.slice(Math.max(0, m.index! - 1200), m.index! + 2500); const text = htmlText(around);
-      const price = text.match(/([\d\s,.]+)\s*(\$|USD|грн)/i); const area = text.match(/([\d\s,.]+)\s*м²/i);
+      const titleOffset = text.indexOf(title);
+      const cardText = titleOffset >= 0 ? text.slice(titleOffset, titleOffset + 2_000) : text;
+      const price = text.match(/([\d\s,.]+)\s*(\$|USD|грн)/i); const area = cardText.match(/([\d\s,.]+)\s*м²/i);
+      const actualCity = cityFromText(text);
       output.push({ source: "dimria", sourceId: /(\d+)(?:\.html)?\/?$/.exec(listingUrl)?.[1], title,
-        price: numberFrom(price?.[1]), currency: price?.[2], area: numberFrom(area?.[1]), city: params.city.labelRu, listingUrl });
+        price: numberFrom(price?.[1]), currency: price?.[2], area: numberFrom(area?.[1]), city: actualCity?.labelRu,
+        location: actualCity ? `${title} · ${actualCity.labelUk}` : undefined, listingUrl });
     }
-    return output;
+    return { listings: output, diagnostics: { rawCards: matches.length, parsedCards: output.length } };
+  },
+  async search(params) {
+    return (await this.searchPage!(params)).listings;
   },
   async getDetail(listing) {
     const html = await fetchText(listing.listingUrl, "dimria-detail");

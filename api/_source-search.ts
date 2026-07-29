@@ -47,8 +47,8 @@ export async function handleSourceSearch(source: SourceName, request: Request): 
     const body = await request.json() as Record<string, unknown>;
     const params = parseParams(body);
     const mapping = params.city[source];
-    if (!mapping?.slug) {
-      return json({ ok: true, source, listings: [], fetchedPages: [], nextPage: batchNumber(body.sourcePage, 1, 10_000), hasMore: false, warnings: [`Для ${source.toUpperCase()} данный город пока не настроен.`] });
+    if (!mapping || mapping.slug === undefined) {
+      return json({ ok: true, source, listings: [], fetchedPages: [], nextPage: batchNumber(body.sourcePage, 1, 10_000), hasMore: false, warnings: [`Для ${source.toUpperCase()} данный город пока не настроен.`], diagnostics: { rawCards: 0, parsedCards: 0, rejectedByCity: 0, rejectedByArea: 0, rejectedByPrice: 0, duplicates: 0, finalListings: 0 } });
     }
     const result = await searchSourceBatch(
       source,

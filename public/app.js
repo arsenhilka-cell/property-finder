@@ -63,7 +63,7 @@ function render() {
     }
     node.querySelector('.source').textContent = sourceLabel[listing.source];
     node.querySelector('h3').textContent = listing.title;
-    node.querySelector('.location').textContent = [listing.city, listing.location].filter(Boolean).join(' · ') || 'Локация не указана';
+    node.querySelector('.location').textContent = listing.location || listing.city || 'Локация не указана';
     node.querySelector('.published').textContent = listing.publishedAt ? `Опубликовано: ${listing.publishedAt}` : '';
     node.querySelector('.price').textContent = listing.price === undefined ? 'Цена не указана' : `${number(listing.price)} ${listing.currency || ''}`;
     node.querySelector('.area').textContent = listing.area === undefined ? 'Площадь не указана' : `${number(listing.area)} м²`;

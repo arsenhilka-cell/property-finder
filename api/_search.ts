@@ -3,6 +3,7 @@ import { olx } from "./_olx.js";
 import { rieltor } from "./_rieltor.js";
 import type { Listing, SourceAdapter, SourceName } from "./_types.js";
 import type { CityConfig } from "./_cities.js";
+import { matchesRequestedCity } from "./_cities.js";
 import { delay } from "./_http.js";
 
 export interface SearchListingsParams {
@@ -39,6 +40,7 @@ export interface SourceBatchResult {
   hasMore: boolean;
   reportedTotal?: number;
   warnings: string[];
+  diagnostics: { rawCards: number; parsedCards: number; rejectedByCity: number; rejectedByArea: number; rejectedByPrice: number; duplicates: number; finalListings: number };
 }
 
 export function getSourceAdapter(source: SourceName): SourceAdapter {
@@ -64,6 +66,12 @@ export function matchesKnownFilters(listing: Listing, params: SearchListingsPara
   return true;
 }
 
+function rejectionReason(listing: Listing, params: SearchListingsParams): "area" | "price" | undefined {
+  if (listing.area !== undefined && ((params.minArea !== undefined && listing.area < params.minArea) || (params.maxArea !== undefined && listing.area > params.maxArea))) return "area";
+  if (listing.price !== undefined && ((params.minPrice !== undefined && listing.price < params.minPrice) || (params.maxPrice !== undefined && listing.price > params.maxPrice))) return "price";
+  return undefined;
+}
+
 export async function searchSourceBatch(source: SourceName, params: SearchListingsParams, sourcePage = 1, sourcePageSize = 3): Promise<SourceBatchResult> {
   const adapter = getSourceAdapter(source);
   const startPage = Math.max(1, Math.floor(sourcePage));
@@ -74,10 +82,12 @@ export async function searchSourceBatch(source: SourceName, params: SearchListin
   const listings: Listing[] = [];
   const fetchedPages: number[] = [];
   const warnings: string[] = [];
+  const diagnostics = { rawCards: 0, parsedCards: 0, rejectedByCity: 0, rejectedByArea: 0, rejectedByPrice: 0, duplicates: 0, finalListings: 0 };
   let nextPage = startPage;
   let hasMore = true;
   let reportedTotal: number | undefined;
   let priorSignature: string | undefined;
+  const seen = new Set<string>();
   try {
     for (let index = 0; index < pageCount; index++) {
       const remaining = deadline - Date.now();
@@ -88,12 +98,33 @@ export async function searchSourceBatch(source: SourceName, params: SearchListin
           ? await adapter.searchPage({ ...params, page, signal: controller.signal, requestTimeoutMs: Math.min(PAGE_TIMEOUT_MS, remaining) })
           : { listings: await adapter.search({ ...params, page, signal: controller.signal, requestTimeoutMs: Math.min(PAGE_TIMEOUT_MS, remaining) }) };
         if (result.reportedTotal !== undefined) reportedTotal = result.reportedTotal;
+        diagnostics.rawCards += result.diagnostics?.rawCards ?? result.listings.length;
+        diagnostics.parsedCards += result.diagnostics?.parsedCards ?? result.listings.length;
         // Check the unfiltered page for pagination. A page may legitimately have
         // zero matches after local validation while a later page still has some.
         const signature = result.listings.map(dedupeKey).sort().join("|");
         if (!result.listings.length || signature === priorSignature) { hasMore = false; break; }
         priorSignature = signature;
-        listings.push(...result.listings.filter(listing => matchesKnownFilters(listing, params)));
+        const cityResults = result.listings.map(listing => ({ listing, city: matchesRequestedCity(listing, params.city, source) }));
+        const explicitlyRequested = cityResults.filter(item => item.city === true).length;
+        const explicitlyOther = cityResults.filter(item => item.city === false).length;
+        if (explicitlyOther > 0 && explicitlyOther >= Math.max(2, explicitlyRequested)) {
+          diagnostics.rejectedByCity += result.listings.length;
+          warnings.push(`${source.toUpperCase()} вернул объявления другого города`);
+          hasMore = false;
+          break;
+        }
+        const pageVerified = explicitlyRequested >= Math.min(3, result.listings.length);
+        for (const { listing, city } of cityResults) {
+          if (city === false || (city === "unknown" && !pageVerified)) { diagnostics.rejectedByCity++; continue; }
+          const key = dedupeKey(listing);
+          if (seen.has(key)) { diagnostics.duplicates++; continue; }
+          seen.add(key);
+          const reason = rejectionReason(listing, params);
+          if (reason === "area") { diagnostics.rejectedByArea++; continue; }
+          if (reason === "price") { diagnostics.rejectedByPrice++; continue; }
+          listings.push(listing);
+        }
         fetchedPages.push(page);
         nextPage = page + 1;
         if (index < pageCount - 1) await delay(400);
@@ -103,7 +134,8 @@ export async function searchSourceBatch(source: SourceName, params: SearchListin
       }
     }
   } finally { clearTimeout(stopTimer); }
-  return { ok: true, source, listings, fetchedPages, nextPage, hasMore, reportedTotal, warnings };
+  diagnostics.finalListings = listings.length;
+  return { ok: true, source, listings, fetchedPages, nextPage, hasMore, reportedTotal, warnings, diagnostics };
 }
 
 function dedupeKey(listing: Listing): string {

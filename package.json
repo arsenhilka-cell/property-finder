@@ -12,6 +12,8 @@
     "test:rieltor": "npm run build --silent && node dist/src/test-source.js rieltor",
     "test:all": "npm run build --silent && node dist/src/test-source.js all",
     "test:cities": "npm run build --silent && node dist/src/test-cities.js",
+    "test:cities:mappings": "npm run build --silent && node dist/src/test-city-mappings.js",
+    "diagnose:cities": "npm run build --silent && node dist/src/diagnose-city-mappings.js",
     "search:test": "npm run build --silent && node dist/src/search-test.js",
     "diagnose:olx": "npm run build --silent && node dist/src/olx-diagnostic.js",
     "test:olx:full": "npm run build --silent && node dist/src/olx-full-test.js",

@@ -1,3 +1,5 @@
+import type { Listing, SourceName } from "./_types.js";
+
 export interface CityConfig {
   id: string;
   labelRu: string;
@@ -15,15 +17,15 @@ function city(config: CityConfig): CityConfig { return config; }
  * from the user-entered label. Add a city by changing this one registry entry.
  */
 export const cities: CityConfig[] = [
-  city({ id: "kyiv", labelRu: "Киев", labelUk: "Київ", aliases: ["Київ", "Kyiv", "Kiev", "Киев"], olx: { slug: "kiev" }, dimria: { slug: "kiev" }, rieltor: { slug: "kyiv" } }),
-  city({ id: "odesa", labelRu: "Одесса", labelUk: "Одеса", aliases: ["Одеса", "Odessa", "Odesa"], olx: { slug: "odessa" }, dimria: { slug: "odessa" }, rieltor: { slug: "odesa" } }),
-  city({ id: "kharkiv", labelRu: "Харьков", labelUk: "Харків", aliases: ["Харків", "Kharkiv", "Kharkov"], olx: { slug: "kharkov" }, dimria: { slug: "kharkov" }, rieltor: { slug: "kharkiv" } }),
-  city({ id: "dnipro", labelRu: "Днепр", labelUk: "Дніпро", aliases: ["Дніпро", "Dnipro", "Днепропетровск", "Dnepropetrovsk"], olx: { slug: "dnepr" }, dimria: { slug: "dnepr" }, rieltor: { slug: "dnipro" } }),
-  city({ id: "zaporizhzhia", labelRu: "Запорожье", labelUk: "Запоріжжя", aliases: ["Запоріжжя", "Zaporizhzhia", "Zaporozhye", "Zaporizhia"], olx: { slug: "zaporizhzhya" }, dimria: { slug: "zaporizhzhia" }, rieltor: { slug: "zaporizhzhia" } }),
-  city({ id: "lviv", labelRu: "Львов", labelUk: "Львів", aliases: ["Львів", "Lviv", "Lvov"], olx: { slug: "lvov" }, dimria: { slug: "lvov" }, rieltor: { slug: "lviv" } }),
+  city({ id: "kyiv", labelRu: "Киев", labelUk: "Київ", aliases: ["Київ", "Києві", "Kyiv", "Kiev", "Киев"], olx: { slug: "kiev" }, dimria: { slug: "kiev" }, rieltor: { slug: "" } }),
+  city({ id: "odesa", labelRu: "Одесса", labelUk: "Одеса", aliases: ["Одеса", "Одесі", "Odessa", "Odesa"], olx: { slug: "odessa" }, dimria: { slug: "odessa" }, rieltor: { slug: "odessa" } }),
+  city({ id: "kharkiv", labelRu: "Харьков", labelUk: "Харків", aliases: ["Харків", "Харкові", "Kharkiv", "Kharkov"], olx: { slug: "kharkov" }, dimria: { slug: "kharkov" }, rieltor: { slug: "harkov" } }),
+  city({ id: "dnipro", labelRu: "Днепр", labelUk: "Дніпро", aliases: ["Дніпро", "Дніпрі", "Dnipro", "Днепропетровск", "Dnepropetrovsk"], olx: { slug: "dnepr" }, dimria: { slug: "dnepr" }, rieltor: { slug: "dnepr" } }),
+  city({ id: "zaporizhzhia", labelRu: "Запорожье", labelUk: "Запоріжжя", aliases: ["Запоріжжя", "Запоріжжі", "Zaporizhzhia", "Zaporozhye", "Zaporizhia"], olx: { slug: "zaporozhe" }, dimria: { slug: "zaporozhye" }, rieltor: { slug: "zaporozhje" } }),
+  city({ id: "lviv", labelRu: "Львов", labelUk: "Львів", aliases: ["Львів", "Львові", "Lviv", "Lvov"], olx: { slug: "lvov" }, dimria: { slug: "lvov" }, rieltor: { slug: "lvov" } }),
   city({ id: "vinnytsia", labelRu: "Винница", labelUk: "Вінниця", aliases: ["Вінниця", "Vinnytsia", "Vinnitsa"], olx: { slug: "vinnitsa" }, dimria: { slug: "vinnitsa" }, rieltor: { slug: "vinnytsia" } }),
   city({ id: "poltava", labelRu: "Полтава", labelUk: "Полтава", aliases: ["Poltava"], olx: { slug: "poltava" }, dimria: { slug: "poltava" }, rieltor: { slug: "poltava" } }),
-  city({ id: "cherkasy", labelRu: "Черкассы", labelUk: "Черкаси", aliases: ["Черкаси", "Cherkasy", "Cherkassy"], olx: { slug: "cherkassy" }, dimria: { slug: "cherkassy" }, rieltor: { slug: "cherkasy" } }),
+  city({ id: "cherkasy", labelRu: "Черкассы", labelUk: "Черкаси", aliases: ["Черкаси", "Черкасах", "Cherkasy", "Cherkassy"], olx: { slug: "cherkassy" }, dimria: { slug: "cherkassy" }, rieltor: { slug: "cherkassy" } }),
   city({ id: "zhytomyr", labelRu: "Житомир", labelUk: "Житомир", aliases: ["Zhytomyr", "Zhitomir"], olx: { slug: "zhitomir" }, dimria: { slug: "zhitomir" }, rieltor: { slug: "zhytomyr" } }),
   city({ id: "kryvyi-rih", labelRu: "Кривой Рог", labelUk: "Кривий Ріг", aliases: ["Кривий Ріг", "Kryvyi Rih", "Krivoy Rog"], olx: { slug: "krivoy-rog" }, dimria: { slug: "krivoy-rog" }, rieltor: { slug: "kryvyi-rih" } }),
   city({ id: "mykolaiv", labelRu: "Николаев", labelUk: "Миколаїв", aliases: ["Миколаїв", "Mykolaiv", "Nikolaev"], olx: { slug: "nikolaev" }, dimria: { slug: "nikolaev" }, rieltor: { slug: "mykolaiv" } }),
@@ -53,6 +55,34 @@ export function resolveCity(value: string): CityConfig | undefined {
 
 export function getCity(id: string): CityConfig | undefined {
   return cities.find(city => city.id === id);
+}
+
+function includesAlias(text: string, alias: string): boolean {
+  const haystack = normalized(text);
+  const needle = normalized(alias);
+  return new RegExp(`(^|[^\\p{L}])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^\\p{L}])`, "iu").test(haystack);
+}
+
+/** Finds a city only when it is actually present in source text. */
+export function cityFromText(text: string): CityConfig | undefined {
+  return cities.find(city => [city.labelRu, city.labelUk, ...city.aliases].some(alias => includesAlias(text, alias)));
+}
+
+/**
+ * `true` means the card explicitly names the requested city; `false` means it
+ * explicitly names another configured city. `unknown` is never a substituted
+ * city name and may only be retained after page-level verification.
+ */
+export function matchesRequestedCity(listing: Listing, city: CityConfig, _source: SourceName): boolean | "unknown" {
+  // Location is the most specific source field (and can contradict a stale
+  // generic city label), therefore it always wins over `listing.city`.
+  for (const value of [listing.location, listing.city]) {
+    if (!value) continue;
+    const factualCity = cityFromText(value);
+    if (factualCity) return factualCity.id === city.id;
+    if ([city.labelRu, city.labelUk, ...city.aliases].some(alias => includesAlias(value, alias))) return true;
+  }
+  return "unknown";
 }
 
 export function publicCities(): Pick<CityConfig, "id" | "labelRu" | "labelUk" | "aliases">[] {

@@ -44,6 +44,11 @@ export interface SourceAdapter {
   source: SourceName;
   buildSearchUrl(params: SearchParams): string;
   search(params: SearchParams): Promise<Listing[]>;
-  searchPage?(params: SearchParams): Promise<{ listings: Listing[]; reportedTotal?: number }>;
+  searchPage?(params: SearchParams): Promise<{
+    listings: Listing[];
+    reportedTotal?: number;
+    /** Counts from the source HTML before local filtering. */
+    diagnostics?: { rawCards: number; parsedCards: number };
+  }>;
   getDetail?(listing: Listing): Promise<Listing | undefined>;
 }
