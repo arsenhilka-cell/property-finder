@@ -46,6 +46,23 @@ export function getSourceAdapter(source: SourceName): SourceAdapter {
   return adapter;
 }
 
+/**
+ * Provider URL filters are not uniformly reliable. Keep a listing with a missing
+ * value, but never return one whose parsed area or price is known to be outside
+ * the requested range.
+ */
+export function matchesKnownFilters(listing: Listing, params: SearchListingsParams): boolean {
+  if (listing.area !== undefined) {
+    if (params.minArea !== undefined && listing.area < params.minArea) return false;
+    if (params.maxArea !== undefined && listing.area > params.maxArea) return false;
+  }
+  if (listing.price !== undefined) {
+    if (params.minPrice !== undefined && listing.price < params.minPrice) return false;
+    if (params.maxPrice !== undefined && listing.price > params.maxPrice) return false;
+  }
+  return true;
+}
+
 export async function searchSourceBatch(source: SourceName, params: SearchListingsParams, sourcePage = 1, sourcePageSize = 3): Promise<SourceBatchResult> {
   const adapter = getSourceAdapter(source);
   const startPage = Math.max(1, Math.floor(sourcePage));
@@ -70,10 +87,12 @@ export async function searchSourceBatch(source: SourceName, params: SearchListin
           ? await adapter.searchPage({ ...params, page, signal: controller.signal, requestTimeoutMs: Math.min(PAGE_TIMEOUT_MS, remaining) })
           : { listings: await adapter.search({ ...params, page, signal: controller.signal, requestTimeoutMs: Math.min(PAGE_TIMEOUT_MS, remaining) }) };
         if (result.reportedTotal !== undefined) reportedTotal = result.reportedTotal;
+        // Check the unfiltered page for pagination. A page may legitimately have
+        // zero matches after local validation while a later page still has some.
         const signature = result.listings.map(dedupeKey).sort().join("|");
         if (!result.listings.length || signature === priorSignature) { hasMore = false; break; }
         priorSignature = signature;
-        listings.push(...result.listings);
+        listings.push(...result.listings.filter(listing => matchesKnownFilters(listing, params)));
         fetchedPages.push(page);
         nextPage = page + 1;
         if (index < pageCount - 1) await delay(400);
@@ -88,16 +107,6 @@ export async function searchSourceBatch(source: SourceName, params: SearchListin
 
 function dedupeKey(listing: Listing): string {
   return listing.sourceId ? `id:${listing.sourceId}` : `url:${listing.listingUrl}`;
-}
-
-function matchesFilters(listing: Listing, params: SearchListingsParams): boolean {
-  if (params.minArea !== undefined && (listing.area === undefined || listing.area < params.minArea)) return false;
-  if (params.maxArea !== undefined && (listing.area === undefined || listing.area > params.maxArea)) return false;
-  // Sources can return USD/EUR alongside UAH. No exchange-rate policy is in this MVP,
-  // so numeric price bounds mean the amount as displayed by that source.
-  if (params.minPrice !== undefined && (listing.price === undefined || listing.price < params.minPrice)) return false;
-  if (params.maxPrice !== undefined && (listing.price === undefined || listing.price > params.maxPrice)) return false;
-  return true;
 }
 
 interface CrawlResult { listings: Listing[]; error?: string; }
@@ -127,9 +136,7 @@ async function crawlSource(adapter: SourceAdapter, params: SearchListingsParams)
     priorPageSignature = signature;
 
     for (const listing of pageListings) {
-      // OLX applies its verified URL filters server-side. Do not discard a valid
-      // card merely because price or area was absent from the card markup.
-      if (adapter.source === "olx" || matchesFilters(listing, params)) unique.set(dedupeKey(listing), listing);
+      if (matchesKnownFilters(listing, params)) unique.set(dedupeKey(listing), listing);
     }
     await delay(REQUEST_DELAY_MS);
   }

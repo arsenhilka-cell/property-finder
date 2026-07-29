@@ -8,7 +8,9 @@ export const dimria: SourceAdapter = {
     const city = /^(одеса|одесса|odessa)$/i.test(params.city || "odessa") ? "odessa" : (params.city || "odessa").toLowerCase();
     const url = new URL(`/uk/${params.operation === "rent" ? "arenda" : "prodazha"}-kom-nedvizhimosti/${city}/`, BASE);
     if (params.page && params.page > 1) url.searchParams.set("page", String(params.page));
-    // Price/area parameter names have not yet been validated against live requests.
+    // DIM.RIA's page currently ignores the unverified price/area query names used
+    // by earlier probes. Do not invent URL parameters; range enforcement happens
+    // centrally after parsing known card values.
     return url.href;
   },
   async search(params) {

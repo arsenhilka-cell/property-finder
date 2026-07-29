@@ -47,9 +47,15 @@ function render() {
   for (const listing of visible) {
     const node = document.querySelector('#card-template').content.cloneNode(true);
     const image = node.querySelector('.photo');
-    image.src = listing.imageUrl || '';
+    const photoPlaceholder = node.querySelector('.photo-placeholder');
     image.alt = listing.title;
-    image.onerror = () => { image.removeAttribute('src'); image.alt = 'Фото отсутствует'; };
+    if (listing.imageUrl) {
+      image.src = listing.imageUrl;
+      image.onerror = () => { image.hidden = true; photoPlaceholder.hidden = false; };
+    } else {
+      image.hidden = true;
+      photoPlaceholder.hidden = false;
+    }
     node.querySelector('.source').textContent = sourceLabel[listing.source];
     node.querySelector('h3').textContent = listing.title;
     node.querySelector('.location').textContent = [listing.city, listing.location].filter(Boolean).join(' · ') || 'Локация не указана';
