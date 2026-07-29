@@ -1,33 +1,9 @@
-import { searchSourceBatch, type SearchListingsParams } from "./_search.js";
 import type { Listing, SourceName } from "./_types.js";
 
 const sourceNames: SourceName[] = ["olx", "dimria", "rieltor"];
 
 function json(value: unknown, status = 200): Response {
   return Response.json(value, { status });
-}
-
-function numberValue(value: unknown): number | undefined {
-  if (value === undefined || value === null || value === "") return undefined;
-  const number = Number(value);
-  return Number.isFinite(number) && number >= 0 ? number : undefined;
-}
-
-function parseParams(value: unknown): SearchListingsParams {
-  if (!value || typeof value !== "object") throw new Error("Expected a JSON object");
-  const body = value as Record<string, unknown>;
-  if (typeof body.city !== "string" || !body.city.trim()) throw new Error("City is required");
-  if (body.operation !== "rent" && body.operation !== "sale") throw new Error("Operation must be rent or sale");
-  const sources = Array.isArray(body.sources) ? body.sources.filter((item): item is SourceName => typeof item === "string" && sourceNames.includes(item as SourceName)) : sourceNames;
-  if (!sources.length) throw new Error("Choose at least one source");
-  return { city: body.city.trim(), operation: body.operation, sources,
-    minPrice: numberValue(body.minPrice), maxPrice: numberValue(body.maxPrice),
-    minArea: numberValue(body.minArea), maxArea: numberValue(body.maxArea) };
-}
-
-function batchNumber(value: unknown, fallback: number, maximum: number): number {
-  const number = Number(value);
-  return Number.isInteger(number) && number > 0 ? Math.min(number, maximum) : fallback;
 }
 
 function normalized(listing: Listing): Listing {
@@ -98,12 +74,7 @@ export async function handleApiRequest(request: Request): Promise<Response> {
   try {
     if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
     const body = await request.json() as Record<string, unknown>;
-    if (pathname === "/api/search") return json({ error: "Use /api/search/olx, /api/search/dimria or /api/search/rieltor" }, 410);
-    const source = /^\/api\/search\/(olx|dimria|rieltor)$/.exec(pathname)?.[1] as SourceName | undefined;
-    if (source) {
-      const result = await searchSourceBatch(source, parseParams(body), batchNumber(body.sourcePage, 1, 10_000), batchNumber(body.sourcePageSize, 3, 5));
-      return json({ ...result, listings: result.listings.map(normalized) });
-    }
+    if (pathname.startsWith("/api/search")) return json({ error: "Search routes are handled by /api/search/olx, /api/search/dimria and /api/search/rieltor" }, 404);
     const listing = inputListing(body.listing);
     const comment = typeof body.comment === "string" ? body.comment.trim().slice(0, 2_000) : "";
     if (pathname === "/api/telegram") return json({ ok: true, ...(await sendToTelegram(listing, comment)) });

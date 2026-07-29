@@ -5,6 +5,15 @@
   "functions": {
     "api/[...path].ts": {
       "maxDuration": 60
+    },
+    "api/search/olx.ts": {
+      "maxDuration": 60
+    },
+    "api/search/dimria.ts": {
+      "maxDuration": 60
+    },
+    "api/search/rieltor.ts": {
+      "maxDuration": 60
     }
   }
 }

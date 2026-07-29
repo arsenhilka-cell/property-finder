@@ -24,8 +24,13 @@
 
 ```text
 api/
-  [...path].ts          единственный Vercel serverless entrypoint
-  _app.ts               API routes
+  search/               физические Vercel Functions для поиска по источникам
+    olx.ts
+    dimria.ts
+    rieltor.ts
+  [...path].ts          catch-all только для Telegram и Google Sheets
+  _source-search.ts     общая реализация source search routes
+  _app.ts               Telegram и Google Sheets API routes
   _search.ts            пакетный поиск и общий сервис для CLI
   _olx.ts               адаптер OLX
   _dimria.ts            адаптер DIM.RIA
@@ -74,7 +79,7 @@ npm start
 
 ## Деплой на Vercel
 
-Vercel автоматически обнаруживает catch-all функцию `api/[...path].ts` и направляет в неё все существующие API routes. Локальный `node:http` сервер находится в `scripts/local-server.ts` и не является частью serverless deployment. Статические файлы из `public/` Vercel отдаёт без дополнительной конфигурации.
+Vercel автоматически обнаруживает отдельные функции `api/search/olx.ts`, `api/search/dimria.ts` и `api/search/rieltor.ts`; поэтому поисковые URL существуют как физические serverless routes. `api/[...path].ts` остаётся catch-all только для Telegram и Google Sheets. Локальный `node:http` сервер находится в `scripts/local-server.ts` и не является частью serverless deployment. Статические файлы из `public/` Vercel отдаёт без дополнительной конфигурации.
 
 Поиск использует три endpoint'а: `POST /api/search/olx`, `POST /api/search/dimria` и `POST /api/search/rieltor`. В body передаются обычные фильтры плюс `sourcePage` и `sourcePageSize`; последний по умолчанию равен 3 и ограничен 5. Каждый ответ возвращает только лёгкие поля карточек, `fetchedPages`, `nextPage`, `hasMore`, `warnings` и, когда источник сообщает его, `reportedTotal`.
 

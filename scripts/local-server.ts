@@ -3,6 +3,9 @@ import { Readable } from "node:stream";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { handleApiRequest } from "../api/_app.js";
+import olxSearch from "../api/search/olx.js";
+import dimriaSearch from "../api/search/dimria.js";
+import rieltorSearch from "../api/search/rieltor.js";
 
 const publicDir = join(process.cwd(), "public");
 const port = Number(process.env.PORT || 3000);
@@ -37,7 +40,15 @@ async function serveStatic(request: IncomingMessage, response: ServerResponse): 
 }
 
 async function handleLocalRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
-  if (request.url?.startsWith("/api/")) { await writeWebResponse(response, await handleApiRequest(toWebRequest(request))); return; }
+  const webRequest = toWebRequest(request);
+  const pathname = new URL(webRequest.url).pathname;
+  const sourceHandlers: Record<string, { fetch(request: Request): Promise<Response> }> = {
+    "/api/search/olx": olxSearch,
+    "/api/search/dimria": dimriaSearch,
+    "/api/search/rieltor": rieltorSearch,
+  };
+  if (sourceHandlers[pathname]) { await writeWebResponse(response, await sourceHandlers[pathname].fetch(webRequest)); return; }
+  if (pathname.startsWith("/api/")) { await writeWebResponse(response, await handleApiRequest(webRequest)); return; }
   await serveStatic(request, response);
 }
 
