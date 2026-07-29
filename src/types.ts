@@ -1,1 +1,1 @@
-export * from "../api/_types.ts";
+export * from "../api/_types.js";

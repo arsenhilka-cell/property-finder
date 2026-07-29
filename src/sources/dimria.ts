@@ -1,1 +1,1 @@
-export * from "../../api/_dimria.ts";
+export * from "../../api/_dimria.js";

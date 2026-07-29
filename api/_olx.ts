@@ -1,5 +1,5 @@
-import type { Listing, SearchParams, SourceAdapter } from "./_types.ts";
-import { absolute, fetchText, htmlText, jsonLd, numberFrom } from "./_http.ts";
+import type { Listing, SearchParams, SourceAdapter } from "./_types.js";
+import { absolute, fetchText, htmlText, jsonLd, numberFrom } from "./_http.js";
 
 const BASE = "https://www.olx.ua";
 

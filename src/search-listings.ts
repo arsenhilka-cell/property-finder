@@ -1,1 +1,1 @@
-export * from "../api/_search.ts";
+export * from "../api/_search.js";

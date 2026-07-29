@@ -1,5 +1,5 @@
-import { olx, parseOlxSearchHtml } from "./sources/olx.ts";
-import { delay, fetchText, htmlText, statuses } from "./utils/http.ts";
+import { olx, parseOlxSearchHtml } from "./sources/olx.js";
+import { delay, fetchText, htmlText, statuses } from "./utils/http.js";
 
 const params = { city: "Одесса", operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
 const unique = new Map<string, string>();

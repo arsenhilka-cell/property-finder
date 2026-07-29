@@ -1,4 +1,4 @@
-import { handleApiRequest } from "./_app.ts";
+import { handleApiRequest } from "./_app.js";
 
 // Vercel discovers TypeScript files in /api automatically. The Fetch handler
 // avoids local node:http server state in a serverless invocation.

@@ -1,9 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { olx } from "./sources/olx.ts";
-import { dimria } from "./sources/dimria.ts";
-import { rieltor } from "./sources/rieltor.ts";
-import type { SourceAdapter, SourceName } from "./types.ts";
-import { delay, statuses } from "./utils/http.ts";
+import { olx } from "./sources/olx.js";
+import { dimria } from "./sources/dimria.js";
+import { rieltor } from "./sources/rieltor.js";
+import type { SourceAdapter, SourceName } from "./types.js";
+import { delay, statuses } from "./utils/http.js";
 
 const adapters: Record<SourceName, SourceAdapter> = { olx, dimria, rieltor };
 const requested = process.argv[2] || "all";

@@ -1,6 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
-import { parseOlxSearchHtml } from "./sources/olx.ts";
-import { htmlText } from "./utils/http.ts";
+import { parseOlxSearchHtml } from "./sources/olx.js";
+import { htmlText } from "./utils/http.js";
 
 const params = { city: "Одесса", operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
 const fileNames = (await readdir("debug"))

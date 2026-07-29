@@ -1,1 +1,1 @@
-export * from "../../api/_olx.ts";
+export * from "../../api/_olx.js";

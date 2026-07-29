@@ -2,10 +2,9 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { Readable } from "node:stream";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
-import { fileURLToPath } from "node:url";
-import { handleApiRequest } from "../api/_app.ts";
+import { handleApiRequest } from "../api/_app.js";
 
-const publicDir = fileURLToPath(new URL("../public/", import.meta.url));
+const publicDir = join(process.cwd(), "public");
 const port = Number(process.env.PORT || 3000);
 const contentTypes: Record<string, string> = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8" };
 
@@ -13,11 +12,13 @@ function toWebRequest(request: IncomingMessage): Request {
   const host = request.headers.host || `localhost:${port}`;
   const method = request.method || "GET";
   const body = method === "GET" || method === "HEAD" ? undefined : Readable.toWeb(request) as ReadableStream;
-  return new Request(`http://${host}${request.url || "/"}`, { method, headers: request.headers as HeadersInit, body, duplex: "half" });
+  return new Request(`http://${host}${request.url || "/"}`, { method, headers: request.headers as HeadersInit, body, duplex: "half" } as RequestInit & { duplex: "half" });
 }
 
 async function writeWebResponse(response: ServerResponse, result: Response): Promise<void> {
-  response.writeHead(result.status, Object.fromEntries(result.headers));
+  const headers: Record<string, string> = {};
+  result.headers.forEach((value, key) => { headers[key] = value; });
+  response.writeHead(result.status, headers);
   response.end(Buffer.from(await result.arrayBuffer()));
 }
 

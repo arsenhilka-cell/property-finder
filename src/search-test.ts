@@ -1,4 +1,4 @@
-import { searchListings } from "./search-listings.ts";
+import { searchListings } from "./search-listings.js";
 
 const params = { city: "Одесса", operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
 console.log("Search params:", params);

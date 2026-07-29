@@ -1,1 +1,1 @@
-export * from "../../api/_rieltor.ts";
+export * from "../../api/_rieltor.js";

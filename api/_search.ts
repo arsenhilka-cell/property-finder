@@ -1,8 +1,8 @@
-import { dimria } from "./_dimria.ts";
-import { olx } from "./_olx.ts";
-import { rieltor } from "./_rieltor.ts";
-import type { Listing, SearchParams, SourceAdapter, SourceName } from "./_types.ts";
-import { delay } from "./_http.ts";
+import { dimria } from "./_dimria.js";
+import { olx } from "./_olx.js";
+import { rieltor } from "./_rieltor.js";
+import type { Listing, SearchParams, SourceAdapter, SourceName } from "./_types.js";
+import { delay } from "./_http.js";
 
 export interface SearchListingsParams {
   city: string;

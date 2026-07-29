@@ -6,14 +6,19 @@
     "node": ">=22"
   },
   "scripts": {
-    "test:olx": "node --experimental-strip-types src/test-source.ts olx",
-    "test:dimria": "node --experimental-strip-types src/test-source.ts dimria",
-    "test:rieltor": "node --experimental-strip-types src/test-source.ts rieltor",
-    "test:all": "node --experimental-strip-types src/test-source.ts all",
-    "search:test": "node --experimental-strip-types src/search-test.ts",
-    "diagnose:olx": "node --experimental-strip-types src/olx-diagnostic.ts",
-    "test:olx:full": "node --experimental-strip-types src/olx-full-test.ts",
-    "analyze:olx:saved": "node --experimental-strip-types src/olx-analyze-saved.ts",
-    "start": "node --env-file=.env --experimental-strip-types scripts/local-server.ts"
+    "build": "tsc -p tsconfig.json",
+    "test:olx": "npm run build --silent && node dist/src/test-source.js olx",
+    "test:dimria": "npm run build --silent && node dist/src/test-source.js dimria",
+    "test:rieltor": "npm run build --silent && node dist/src/test-source.js rieltor",
+    "test:all": "npm run build --silent && node dist/src/test-source.js all",
+    "search:test": "npm run build --silent && node dist/src/search-test.js",
+    "diagnose:olx": "npm run build --silent && node dist/src/olx-diagnostic.js",
+    "test:olx:full": "npm run build --silent && node dist/src/olx-full-test.js",
+    "analyze:olx:saved": "npm run build --silent && node dist/src/olx-analyze-saved.js",
+    "start": "npm run build --silent && node --env-file=.env dist/scripts/local-server.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
   }
 }

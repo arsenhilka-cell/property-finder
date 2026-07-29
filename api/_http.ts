@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { HttpStatus } from "./_types.ts";
+import type { HttpStatus } from "./_types.js";
 
 const DEBUG_DIR = new URL("../debug/", import.meta.url);
 const HTTP_TIMEOUT_MS = 20_000;
