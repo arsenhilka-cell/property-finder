@@ -6,6 +6,7 @@ import { handleApiRequest } from "../api/_app.js";
 import olxSearch from "../api/search/olx.js";
 import dimriaSearch from "../api/search/dimria.js";
 import rieltorSearch from "../api/search/rieltor.js";
+import citiesApi from "../api/cities.js";
 
 const publicDir = join(process.cwd(), "public");
 const port = Number(process.env.PORT || 3000);
@@ -42,10 +43,11 @@ async function serveStatic(request: IncomingMessage, response: ServerResponse): 
 async function handleLocalRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const webRequest = toWebRequest(request);
   const pathname = new URL(webRequest.url).pathname;
-  const sourceHandlers: Record<string, { fetch(request: Request): Promise<Response> }> = {
+  const sourceHandlers: Record<string, { fetch(request: Request): Response | Promise<Response> }> = {
     "/api/search/olx": olxSearch,
     "/api/search/dimria": dimriaSearch,
     "/api/search/rieltor": rieltorSearch,
+    "/api/cities": citiesApi,
   };
   if (sourceHandlers[pathname]) { await writeWebResponse(response, await sourceHandlers[pathname].fetch(webRequest)); return; }
   if (pathname.startsWith("/api/")) { await writeWebResponse(response, await handleApiRequest(webRequest)); return; }

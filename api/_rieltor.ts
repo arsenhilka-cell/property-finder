@@ -5,7 +5,8 @@ const BASE = "https://rieltor.ua";
 export const rieltor: SourceAdapter = {
   source: "rieltor",
   buildSearchUrl(params) {
-    const city = /^(одеса|одесса|odessa)$/i.test(params.city || "odessa") ? "odessa" : (params.city || "odessa").toLowerCase();
+    const city = params.city.rieltor?.slug;
+    if (!city) throw new Error(`RIELTOR does not support ${params.city.labelRu} yet`);
     const url = new URL(`/${city}/commercials-${params.operation === "rent" ? "rent" : "sale"}/`, BASE);
     if (params.page && params.page > 1) url.searchParams.set("page", String(params.page));
     if (params.minPrice !== undefined) url.searchParams.set("price_min", String(params.minPrice));
@@ -26,7 +27,7 @@ export const rieltor: SourceAdapter = {
       const price = /class=["']catalog-card-price-title["'][^>]*>([\s\S]*?)<\/strong>/i.exec(card)?.[1]?.match(/([\d\s,.]+)\s*(\$|USD|грн)/i);
       const area = htmlText(card).match(/([\d\s,.]+)\s*м²/i); const ppm = htmlText(card).match(/([\d\s,.]+)\s*(?:\$|грн)\s*\/\s*м²/i);
       output.push({ source: "rieltor", sourceId: /view\/(\d+)/.exec(listingUrl)?.[1], title,
-        price: numberFrom(price?.[1]), currency: price?.[2], area: numberFrom(area?.[1]), pricePerM2: numberFrom(ppm?.[1]), city: params.city || "Одеса",
+        price: numberFrom(price?.[1]), currency: price?.[2], area: numberFrom(area?.[1]), pricePerM2: numberFrom(ppm?.[1]), city: params.city.labelRu,
         location: title, imageUrl: /<img[^>]+src=["']([^"']+)/i.exec(card)?.[1],
         publishedAt: htmlText(/class=["']catalog-card-update["'][\s\S]*?<span>([\s\S]*?)<\/span>/i.exec(card)?.[1] || "") || undefined,
         description: htmlText(/class=["']catalog-card-description["'][\s\S]*?<span[^>]*>([\s\S]*?)<\/span>/i.exec(card)?.[1] || "") || undefined, listingUrl });

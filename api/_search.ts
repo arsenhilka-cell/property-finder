@@ -1,11 +1,12 @@
 import { dimria } from "./_dimria.js";
 import { olx } from "./_olx.js";
 import { rieltor } from "./_rieltor.js";
-import type { Listing, SearchParams, SourceAdapter, SourceName } from "./_types.js";
+import type { Listing, SourceAdapter, SourceName } from "./_types.js";
+import type { CityConfig } from "./_cities.js";
 import { delay } from "./_http.js";
 
 export interface SearchListingsParams {
-  city: string;
+  city: CityConfig;
   operation: "rent" | "sale";
   minPrice?: number;
   maxPrice?: number;
@@ -116,7 +117,7 @@ async function crawlSource(adapter: SourceAdapter, params: SearchListingsParams)
   let priorPageSignature: string | undefined;
 
   for (let page = 1; page <= MAX_PAGES_SAFETY_LIMIT; page++) {
-    const sourceParams: SearchParams = { ...params, page };
+    const sourceParams = { ...params, page };
     let pageListings: Listing[];
     try { pageListings = await adapter.search(sourceParams); }
     catch (error) {

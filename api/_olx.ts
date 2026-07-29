@@ -48,7 +48,7 @@ export function parseOlxSearchHtml(html: string, params: SearchParams): { listin
     if (price === undefined) diagnostics.missingPrice++;
     if (area === undefined) diagnostics.missingArea++;
     listings.push({ source: "olx", sourceId: /-(ID[\w-]+)\.html/i.exec(listingUrl)?.[1], title,
-      price, currency: priceMatch?.[2], area, city: params.city || "Одеса",
+      price, currency: priceMatch?.[2], area, city: params.city.labelRu,
       location: allText.match(/Одеса,\s*[^-<]{0,80}/i)?.[0]?.trim(),
       imageUrl: absolute(BASE, /<img[^>]+src=["']([^"']+)/i.exec(fragment)?.[1]), listingUrl });
   }
@@ -59,7 +59,8 @@ export function parseOlxSearchHtml(html: string, params: SearchParams): { listin
 export const olx: SourceAdapter = {
   source: "olx",
   buildSearchUrl(params) {
-    const city = /^(одеса|одесса|odessa)$/i.test(params.city || "odessa") ? "odessa" : (params.city || "odessa").toLowerCase();
+    const city = params.city.olx?.slug;
+    if (!city) throw new Error(`OLX does not support ${params.city.labelRu} yet`);
     const operation = params.operation === "rent" ? "arenda-kommercheskoy-nedvizhimosti" : "prodazha-kommercheskoy-nedvizhimosti";
     const url = new URL(`/uk/nedvizhimost/kommercheskaya-nedvizhimost/${operation}/${city}/`, BASE);
     // The OLX filter UI adds this explicit currency for a UAH price range.

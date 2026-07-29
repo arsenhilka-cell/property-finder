@@ -1,6 +1,9 @@
 import { searchListings } from "./search-listings.js";
+import { getCity } from "../api/_cities.js";
 
-const params = { city: "Одесса", operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
+const city = getCity("odesa");
+if (!city) throw new Error("City registry is missing Odesa");
+const params = { city, operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
 console.log("Search params:", params);
 const result = await searchListings(params);
 

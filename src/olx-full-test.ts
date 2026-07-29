@@ -1,7 +1,10 @@
 import { olx, parseOlxSearchHtml } from "./sources/olx.js";
 import { delay, fetchText, htmlText, statuses } from "./utils/http.js";
+import { getCity } from "../api/_cities.js";
 
-const params = { city: "Одесса", operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
+const city = getCity("odesa");
+if (!city) throw new Error("City registry is missing Odesa");
+const params = { city, operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
 const unique = new Map<string, string>();
 let rawCards = 0;
 let reportedTotal: number | undefined;

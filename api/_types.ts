@@ -1,5 +1,7 @@
+import type { CityConfig } from "./_cities.js";
+
 export interface SearchParams {
-  city?: string;
+  city: CityConfig;
   operation: "rent" | "sale";
   minPrice?: number;
   maxPrice?: number;

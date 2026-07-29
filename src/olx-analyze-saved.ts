@@ -1,8 +1,11 @@
 import { readdir, readFile } from "node:fs/promises";
 import { parseOlxSearchHtml } from "./sources/olx.js";
 import { htmlText } from "./utils/http.js";
+import { getCity } from "../api/_cities.js";
 
-const params = { city: "Одесса", operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
+const city = getCity("odesa");
+if (!city) throw new Error("City registry is missing Odesa");
+const params = { city, operation: "rent" as const, minArea: 30, maxArea: 100, maxPrice: 60_000 };
 const fileNames = (await readdir("debug"))
   .map(name => ({ name, page: Number(/^olx-full-p(\d+)\.html$/.exec(name)?.[1]) }))
   .filter(item => Number.isInteger(item.page) && item.page > 0)

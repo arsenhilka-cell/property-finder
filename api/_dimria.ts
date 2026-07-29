@@ -5,7 +5,8 @@ const BASE = "https://dom.ria.com";
 export const dimria: SourceAdapter = {
   source: "dimria",
   buildSearchUrl(params) {
-    const city = /^(одеса|одесса|odessa)$/i.test(params.city || "odessa") ? "odessa" : (params.city || "odessa").toLowerCase();
+    const city = params.city.dimria?.slug;
+    if (!city) throw new Error(`DIM.RIA does not support ${params.city.labelRu} yet`);
     const url = new URL(`/uk/${params.operation === "rent" ? "arenda" : "prodazha"}-kom-nedvizhimosti/${city}/`, BASE);
     if (params.page && params.page > 1) url.searchParams.set("page", String(params.page));
     // DIM.RIA's page currently ignores the unverified price/area query names used
@@ -23,7 +24,7 @@ export const dimria: SourceAdapter = {
       seen.add(listingUrl); const around = html.slice(Math.max(0, m.index! - 1200), m.index! + 2500); const text = htmlText(around);
       const price = text.match(/([\d\s,.]+)\s*(\$|USD|грн)/i); const area = text.match(/([\d\s,.]+)\s*м²/i);
       output.push({ source: "dimria", sourceId: /(\d+)(?:\.html)?\/?$/.exec(listingUrl)?.[1], title,
-        price: numberFrom(price?.[1]), currency: price?.[2], area: numberFrom(area?.[1]), city: params.city || "Одеса", listingUrl });
+        price: numberFrom(price?.[1]), currency: price?.[2], area: numberFrom(area?.[1]), city: params.city.labelRu, listingUrl });
     }
     return output;
   },

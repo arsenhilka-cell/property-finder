@@ -12,6 +12,10 @@ const sort = document.querySelector('#sort');
 const submit = form.querySelector('button');
 const stopSearch = document.querySelector('#stop-search');
 const progress = document.querySelector('#search-progress');
+const cityQuery = document.querySelector('#city-query');
+const cityId = document.querySelector('#city-id');
+const cityOptions = document.querySelector('#city-options');
+const citySelected = document.querySelector('#city-selected');
 const sendDialog = document.querySelector('#send-dialog');
 const sendForm = document.querySelector('#send-form');
 const sendTitle = document.querySelector('#send-title');
@@ -21,6 +25,7 @@ let sendMode = null;
 let activeSheetsButton = null;
 
 const sourceLabel = { olx: 'OLX', dimria: 'DIM.RIA', rieltor: 'RIELTOR' };
+let cityCatalog = [];
 const number = value => value === undefined ? '—' : new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 0 }).format(value);
 const dateValue = value => { const parsed = value ? Date.parse(value) : NaN; return Number.isNaN(parsed) ? 0 : parsed; };
 
@@ -73,6 +78,47 @@ function render() {
 }
 
 function showNotice(text, type = '') { notice.textContent = text; notice.className = text ? `notice ${type}` : ''; }
+
+function cityMatches(city, query) {
+  const value = query.trim().toLowerCase().replace(/ё/g, 'е').replace(/[ʼ’`´]/g, "'");
+  return !value || [city.labelRu, city.labelUk, city.id, ...city.aliases].some(alias => alias.toLowerCase().replace(/ё/g, 'е').replace(/[ʼ’`´]/g, "'").includes(value));
+}
+
+function renderCityOptions() {
+  const matches = cityCatalog.filter(city => cityMatches(city, cityQuery.value)).slice(0, 80);
+  cityOptions.replaceChildren(...matches.map(city => {
+    const option = document.createElement('button');
+    option.type = 'button'; option.className = 'city-option'; option.role = 'option'; option.textContent = city.labelRu;
+    option.onclick = () => selectCity(city);
+    return option;
+  }));
+  cityOptions.hidden = matches.length === 0;
+  cityQuery.setAttribute('aria-expanded', String(!cityOptions.hidden));
+}
+
+function selectCity(city) {
+  cityId.value = city.id;
+  cityQuery.value = city.labelRu;
+  citySelected.textContent = `Выбран город: ${city.labelRu}`;
+  cityOptions.hidden = true;
+  cityQuery.setAttribute('aria-expanded', 'false');
+}
+
+async function loadCities() {
+  try {
+    const response = await fetch('/api/cities');
+    const result = await readJsonResponse(response);
+    cityCatalog = result.cities || [];
+    const defaultCity = cityCatalog.find(city => city.id === 'odesa');
+    if (defaultCity) selectCity(defaultCity);
+    cityQuery.addEventListener('focus', renderCityOptions);
+    cityQuery.addEventListener('input', () => { cityId.value = ''; citySelected.textContent = 'Выберите город из списка'; renderCityOptions(); });
+    cityQuery.addEventListener('blur', () => setTimeout(() => { cityOptions.hidden = true; cityQuery.setAttribute('aria-expanded', 'false'); }, 120));
+  } catch (error) {
+    citySelected.textContent = `Не удалось загрузить города: ${error.message}`;
+    cityQuery.disabled = true;
+  }
+}
 
 async function readJsonResponse(response) {
   const text = await response.text();
@@ -144,8 +190,9 @@ function closeSendDialog() {
 form.addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(form);
-  const payload = Object.fromEntries(['city', 'operation', 'minPrice', 'maxPrice', 'minArea', 'maxArea'].map(key => [key, data.get(key) || undefined]));
+  const payload = Object.fromEntries(['cityId', 'operation', 'minPrice', 'maxPrice', 'minArea', 'maxArea'].map(key => [key, data.get(key) || undefined]));
   const selected = data.getAll('sources');
+  if (!payload.cityId) { showNotice('Выберите город из списка', 'error'); cityQuery.focus(); return; }
   if (!selected.length) { showNotice('Выберите хотя бы один источник', 'error'); return; }
   const state = { stopped: false, sources: Object.fromEntries(selected.map(source => [source, { count: 0, nextPage: 1, hasMore: true, done: false }])) };
   activeSearch = state; listings = []; page = 1; cards.replaceChildren(); pagination.replaceChildren();
@@ -182,3 +229,4 @@ sendForm.addEventListener('submit', async event => {
   } catch (error) { showNotice(`Не удалось отправить: ${error.message}`, 'error'); }
   finally { sendSubmit.disabled = false; }
 });
+loadCities();

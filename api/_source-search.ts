@@ -1,5 +1,6 @@
 import { searchSourceBatch, type SearchListingsParams } from "./_search.js";
 import type { Listing, SourceName } from "./_types.js";
+import { getCity } from "./_cities.js";
 
 function json(value: unknown, status = 200): Response {
   return Response.json(value, { status });
@@ -19,10 +20,12 @@ function batchNumber(value: unknown, fallback: number, maximum: number): number 
 function parseParams(value: unknown): SearchListingsParams {
   if (!value || typeof value !== "object") throw new Error("Expected a JSON object");
   const body = value as Record<string, unknown>;
-  if (typeof body.city !== "string" || !body.city.trim()) throw new Error("City is required");
+  if (typeof body.cityId !== "string" || !body.cityId.trim()) throw new Error("City selection is required");
+  const city = getCity(body.cityId);
+  if (!city) throw new Error("Unknown cityId");
   if (body.operation !== "rent" && body.operation !== "sale") throw new Error("Operation must be rent or sale");
   return {
-    city: body.city.trim(),
+    city,
     operation: body.operation,
     minPrice: numberValue(body.minPrice), maxPrice: numberValue(body.maxPrice),
     minArea: numberValue(body.minArea), maxArea: numberValue(body.maxArea),
@@ -42,9 +45,14 @@ export async function handleSourceSearch(source: SourceName, request: Request): 
   if (request.method !== "POST") return json({ ok: false, error: "Method not allowed" }, 405);
   try {
     const body = await request.json() as Record<string, unknown>;
+    const params = parseParams(body);
+    const mapping = params.city[source];
+    if (!mapping?.slug) {
+      return json({ ok: true, source, listings: [], fetchedPages: [], nextPage: batchNumber(body.sourcePage, 1, 10_000), hasMore: false, warnings: [`Для ${source.toUpperCase()} данный город пока не настроен.`] });
+    }
     const result = await searchSourceBatch(
       source,
-      parseParams(body),
+      params,
       batchNumber(body.sourcePage, 1, 10_000),
       batchNumber(body.sourcePageSize, 3, 5),
     );

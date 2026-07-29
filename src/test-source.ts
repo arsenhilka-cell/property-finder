@@ -4,16 +4,19 @@ import { dimria } from "./sources/dimria.js";
 import { rieltor } from "./sources/rieltor.js";
 import type { SourceAdapter, SourceName } from "./types.js";
 import { delay, statuses } from "./utils/http.js";
+import { getCity } from "../api/_cities.js";
 
 const adapters: Record<SourceName, SourceAdapter> = { olx, dimria, rieltor };
 const requested = process.argv[2] || "all";
 
 async function test(adapter: SourceAdapter) {
+  const city = getCity("odesa");
+  if (!city) throw new Error("City registry is missing Odesa");
   statuses.length = 0;
   console.log(`\n=== ${adapter.source.toUpperCase()} ===`);
-  console.log("Search URL:", adapter.buildSearchUrl({ city: "Одеса", operation: "rent" }));
+  console.log("Search URL:", adapter.buildSearchUrl({ city, operation: "rent" }));
   const pages = [];
-  for (const page of [1, 2, 3]) { pages.push(await adapter.search({ city: "Одеса", operation: "rent", page })); await delay(900); }
+  for (const page of [1, 2, 3]) { pages.push(await adapter.search({ city, operation: "rent", page })); await delay(900); }
   console.log("Listings by page:", pages.map(x => x.length).join(", "));
   console.log("First 3 page-1 listings:", JSON.stringify(pages[0].slice(0, 3), null, 2));
   console.log("Pages differ (URLs):", new Set(pages.map(x => x.slice(0, 10).map(y => y.listingUrl).join("|"))).size === 3);
@@ -22,7 +25,7 @@ async function test(adapter: SourceAdapter) {
     console.log("Detail probe:", JSON.stringify(detail, null, 2));
   }
   // One more, deliberately spaced, normal search request: total is five requests including a detail page when available.
-  await adapter.search({ city: "Одеса", operation: "rent", page: 1 });
+  await adapter.search({ city, operation: "rent", page: 1 });
   console.log("HTTP statuses:", JSON.stringify(statuses, null, 2));
   await mkdir("debug", { recursive: true });
   await writeFile(`debug/${adapter.source}-statuses.json`, JSON.stringify(statuses, null, 2));

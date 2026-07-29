@@ -12,7 +12,7 @@
         <h1>Коммерческая недвижимость</h1>
         <p class="muted">Поиск по объявлениям Украины</p>
         <form id="search-form">
-          <label>Город <input name="city" value="Одесса" required /></label>
+          <div class="city-select"><label for="city-query">Город</label><input id="city-query" type="search" autocomplete="off" placeholder="Начните вводить город" aria-controls="city-options" aria-expanded="false" /><input id="city-id" name="cityId" type="hidden" /><div id="city-options" class="city-options" role="listbox" hidden></div><p id="city-selected" class="city-selected">Загрузка списка городов…</p></div>
           <label>Операция
             <select name="operation"><option value="rent">Аренда</option><option value="sale">Продажа</option></select>
           </label>

@@ -11,6 +11,7 @@
     "test:dimria": "npm run build --silent && node dist/src/test-source.js dimria",
     "test:rieltor": "npm run build --silent && node dist/src/test-source.js rieltor",
     "test:all": "npm run build --silent && node dist/src/test-source.js all",
+    "test:cities": "npm run build --silent && node dist/src/test-cities.js",
     "search:test": "npm run build --silent && node dist/src/search-test.js",
     "diagnose:olx": "npm run build --silent && node dist/src/olx-diagnostic.js",
     "test:olx:full": "npm run build --silent && node dist/src/olx-full-test.js",
