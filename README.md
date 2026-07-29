@@ -39,7 +39,7 @@ public/
 
 ```bash
 git clone <your-repository-url>
-cd new-chat
+cd property-finder
 cp .env.example .env
 npm install
 ```
