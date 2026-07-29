@@ -1,63 +1,53 @@
-# Покрытие городов
+# Покрытие крупных городов Украины
 
-Статус `verified` означает проверку конечного URL, заголовка выдачи и карточек; `needs_review` не имеет активного mapping и в production возвращает warning вместо чужой выдачи.
+В справочник включаются только города с населением примерно от 100 000 человек. `verified` означает, что проверены конечный URL, страница выдачи и карточки; без такого подтверждения source mapping не включается.
 
 | Область | Город | City ID | OLX | DIM.RIA | RIELTOR | Последняя проверка | Примечание |
 |---|---|---|---|---|---|---|---|
-| г. Киев | Киев | kyiv | verified | verified | verified | 2026-07-29 | Базовый город |
-| Одесская | Одесса | odesa | verified | verified | verified | 2026-07-29 | Базовый город |
-| Харьковская | Харьков | kharkiv | verified | verified | verified | 2026-07-29 | Базовый город |
-| Днепропетровская | Днепр | dnipro | verified | verified | verified | 2026-07-29 | Базовый город |
-| Запорожская | Запорожье | zaporizhzhia | verified | verified | verified | 2026-07-29 | Базовый город |
-| Львовская | Львов | lviv | verified | verified | verified | 2026-07-29 | Базовый город |
-| Винницкая | Винница | vinnytsia | verified | verified | verified | 2026-07-29 | Базовый город |
-| Полтавская | Полтава | poltava | verified | verified | verified | 2026-07-29 | Базовый город |
-| Черкасская | Черкассы | cherkasy | verified | verified | verified | 2026-07-29 | Базовый город |
-| Житомирская | Житомир | zhytomyr | verified | verified | verified | 2026-07-29 | Базовый город |
-| Днепропетровская | Кривой Рог | kryvyi-rih | verified | verified | verified | 2026-07-29 | Базовый город |
-| Николаевская | Николаев | mykolaiv | verified | verified | verified | 2026-07-29 | Базовый город |
-| Херсонская | Херсон | kherson | verified | verified | verified | 2026-07-29 | Базовый город |
-| Черниговская | Чернигов | chernihiv | verified | verified | verified | 2026-07-29 | Базовый город |
-| Сумская | Сумы | sumy | verified | verified | verified | 2026-07-29 | Базовый город |
-| Черновицкая | Черновцы | chernivtsi | verified | verified | verified | 2026-07-29 | Базовый город |
-| Закарпатская | Ужгород | uzhhorod | verified | verified | verified | 2026-07-29 | Базовый город |
-| Ровенская | Ровно | rivne | verified | verified | verified | 2026-07-29 | Базовый город |
-| Волынская | Луцк | lutsk | verified | verified | verified | 2026-07-29 | Базовый город |
-| Ивано-Франковская | Ивано-Франковск | ivano-frankivsk | verified | verified | verified | 2026-07-29 | Базовый город |
-| Тернопольская | Тернополь | ternopil | verified | verified | verified | 2026-07-29 | Базовый город |
-| Кировоградская | Кропивницкий | kropyvnytskyi | verified | verified | verified | 2026-07-29 | Базовый город |
-| Донецкая | Донецк | donetsk | unsupported | unsupported | unsupported | 2026-07-29 | Mapping не добавлен |
-| Луганская | Луганск | luhansk | unsupported | unsupported | unsupported | 2026-07-29 | Mapping не добавлен |
-| АР Крым | Симферополь | simferopol | unsupported | unsupported | unsupported | 2026-07-29 | Mapping не добавлен |
-| Киевская | Белая Церковь | bila-tserkva | verified | needs_review | needs_review | 2026-07-29 | OLX: 48/49 карточек подтверждают город |
-| Киевская | Бровары | brovary | verified | needs_review | verified | 2026-07-29 | RIELTOR: 19/19 карточек подтверждают город |
-| Киевская | Борисполь | boryspil | verified | needs_review | needs_review | 2026-07-29 | OLX: 48/49 карточек подтверждают город |
-| Киевская | Буча | bucha | verified | needs_review | verified | 2026-07-29 | RIELTOR: 20/20 карточек подтверждают город |
-| Киевская | Ирпень | irpin | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Вишнёвое | vyshneve | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Боярка | boyarka | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Вышгород | vyshhorod | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Обухов | obukhiv | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Фастов | fastiv | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Васильков | vasylkiv | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Украинка | ukrainka | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Переяслав | pereiaslav | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Славутич | slavutych | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Яготин | yahotyn | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Богуслав | bohuslav | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Сквира | skvyra | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Тараща | tarashcha | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Кагарлык | kaharlyk | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Мироновка | myronivka | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Ржищев | rzhyshchiv | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Березань | berezan | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Барышевка | baryshivka | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Бородянка | borodianka | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Гостомель | hostomel | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
-| Киевская | Коцюбинское | kotsiubynske | needs_review | needs_review | needs_review | 2026-07-29 | Без активного mapping |
+| г. Киев | Киев | kyiv | verified | verified | verified | 2026-07-29 | Областной центр |
+| Одесская | Одесса | odesa | verified | verified | verified | 2026-07-29 | Областной центр |
+| Харьковская | Харьков | kharkiv | verified | verified | verified | 2026-07-29 | Областной центр |
+| Днепропетровская | Днепр | dnipro | verified | verified | verified | 2026-07-29 | Областной центр |
+| Запорожская | Запорожье | zaporizhzhia | verified | verified | verified | 2026-07-29 | Областной центр |
+| Львовская | Львов | lviv | verified | verified | verified | 2026-07-29 | Областной центр |
+| Винницкая | Винница | vinnytsia | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, первые 20 карточек — Винница; RIELTOR candidate вернул Киев |
+| Полтавская | Полтава | poltava | verified | verified | verified | 2026-07-29 | Все источники: 200 без redirect, первые карточки подтверждают Полтаву |
+| Черкасская | Черкассы | cherkasy | verified | verified | verified | 2026-07-29 | Областной центр |
+| Житомирская | Житомир | zhytomyr | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Николаевская | Николаев | mykolaiv | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Херсонская | Херсон | kherson | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Черниговская | Чернигов | chernihiv | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Сумская | Сумы | sumy | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Черновицкая | Черновцы | chernivtsi | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Закарпатская | Ужгород | uzhhorod | needs_review | needs_review | needs_review | — | Областной центр |
+| Ровенская | Ровно | rivne | needs_review | needs_review | needs_review | — | Областной центр |
+| Волынская | Луцк | lutsk | needs_review | needs_review | needs_review | — | Областной центр |
+| Ивано-Франковская | Ивано-Франковск | ivano-frankivsk | needs_review | needs_review | needs_review | — | Областной центр |
+| Тернопольская | Тернополь | ternopil | needs_review | needs_review | needs_review | — | Областной центр |
+| Кировоградская | Кропивницкий | kropyvnytskyi | needs_review | needs_review | needs_review | — | Областной центр |
+| Хмельницкая | Хмельницкий | khmelnytskyi | needs_review | needs_review | needs_review | — | Областной центр |
+| Днепропетровская | Кривой Рог | kryvyi-rih | needs_review | needs_review | needs_review | — | Крупный город |
+| Днепропетровская | Каменское | kamianske | needs_review | needs_review | needs_review | — | Крупный город |
+| Полтавская | Кременчуг | kremenchuk | needs_review | needs_review | needs_review | — | Крупный город |
+| Киевская | Белая Церковь | bila-tserkva | verified | needs_review | needs_review | 2026-07-29 | OLX: карточки подтверждены |
+| Киевская | Бровары | brovary | verified | needs_review | verified | 2026-07-29 | OLX/RIELTOR: карточки подтверждены |
+| Днепропетровская | Павлоград | pavlohrad | needs_review | needs_review | needs_review | — | Пороговый размер, проверять отдельно |
+| Донецкая | Донецк | donetsk | unsupported | unsupported | unsupported | — | Нет mapping |
+| Донецкая | Мариуполь | mariupol | unsupported | unsupported | unsupported | — | Нет mapping |
+| Донецкая | Макеевка | makiivka | unsupported | unsupported | unsupported | — | Нет mapping |
+| Донецкая | Горловка | horlivka | unsupported | unsupported | unsupported | — | Нет mapping |
+| Донецкая | Краматорск | kramatorsk | needs_review | needs_review | needs_review | — | Нет активного mapping |
+| Донецкая | Славянск | sloviansk | needs_review | needs_review | needs_review | — | Нет активного mapping |
+| Запорожская | Мелитополь | melitopol | needs_review | needs_review | needs_review | — | Нет активного mapping |
+| Запорожская | Бердянск | berdiansk | needs_review | needs_review | needs_review | — | Нет активного mapping |
+| Луганская | Луганск | luhansk | unsupported | unsupported | unsupported | — | Нет mapping |
+| Луганская | Алчевск | alchevsk | unsupported | unsupported | unsupported | — | Нет mapping |
+| Луганская | Северодонецк | sievierodonetsk | unsupported | unsupported | unsupported | — | Нет mapping |
+| АР Крым | Симферополь | simferopol | unsupported | unsupported | unsupported | — | Нет mapping |
+| г. Севастополь | Севастополь | sevastopol | unsupported | unsupported | unsupported | — | Нет mapping |
 
 ## Сводка
 
-- Всего городов в справочнике: 51.
-- Verified OLX: 26; DIM.RIA: 22; RIELTOR: 24.
-- Partial: 0; unsupported: 9; needs_review: 72 source mappings.
+- Всего крупных городов в справочнике: 41.
+- Verified OLX: 11; DIM.RIA: 9; RIELTOR: 9.
+- Partial: 0; unsupported: 27; needs_review: 67 source mappings.
