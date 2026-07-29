@@ -18,12 +18,12 @@
 | Херсонская | Херсон | kherson | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
 | Черниговская | Чернигов | chernihiv | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Чернигов; RIELTOR candidate вернул Киев |
 | Сумская | Сумы | sumy | verified | verified | verified | 2026-07-29 | Все источники: 200 без redirect, первые карточки подтверждают Сумы |
-| Черновицкая | Черновцы | chernivtsi | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
-| Закарпатская | Ужгород | uzhhorod | needs_review | needs_review | needs_review | — | Областной центр |
-| Ровенская | Ровно | rivne | needs_review | needs_review | needs_review | — | Областной центр |
-| Волынская | Луцк | lutsk | needs_review | needs_review | needs_review | — | Областной центр |
-| Ивано-Франковская | Ивано-Франковск | ivano-frankivsk | needs_review | needs_review | needs_review | — | Областной центр |
-| Тернопольская | Тернополь | ternopil | needs_review | needs_review | needs_review | — | Областной центр |
+| Черновицкая | Черновцы | chernivtsi | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Черновцы; RIELTOR candidate вернул Киев |
+| Закарпатская | Ужгород | uzhhorod | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Ужгород; RIELTOR candidate вернул Киев |
+| Ровенская | Ровно | rivne | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Ровно; RIELTOR candidate вернул Киев |
+| Волынская | Луцк | lutsk | verified | verified | partial | 2026-07-29 | OLX/DIM.RIA: чистая выдача; RIELTOR: 11/20 Луцк, остальные неидентифицированные пригородные карточки — mapping не активирован |
+| Ивано-Франковская | Ивано-Франковск | ivano-frankivsk | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Ивано-Франковск; RIELTOR candidate вернул Киев |
+| Тернопольская | Тернополь | ternopil | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Тернополь; RIELTOR candidate вернул Киев |
 | Кировоградская | Кропивницкий | kropyvnytskyi | needs_review | needs_review | needs_review | — | Областной центр |
 | Хмельницкая | Хмельницкий | khmelnytskyi | needs_review | needs_review | needs_review | — | Областной центр |
 | Днепропетровская | Кривой Рог | kryvyi-rih | needs_review | needs_review | needs_review | — | Крупный город |
@@ -49,5 +49,5 @@
 ## Сводка
 
 - Всего крупных городов в справочнике: 41.
-- Verified OLX: 15; DIM.RIA: 13; RIELTOR: 10.
-- Partial: 0; unsupported: 27; needs_review: 58 source mappings.
+- Verified OLX: 21; DIM.RIA: 19; RIELTOR: 10.
+- Partial: 1; unsupported: 27; needs_review: 45 source mappings.
