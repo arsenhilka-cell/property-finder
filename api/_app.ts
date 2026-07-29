@@ -1,5 +1,5 @@
-import { searchListings, type SearchListingsParams } from "./search-listings.ts";
-import type { Listing, SourceName } from "./types.ts";
+import { searchListings, type SearchListingsParams } from "./_search.ts";
+import type { Listing, SourceName } from "./_types.ts";
 
 const sourceNames: SourceName[] = ["olx", "dimria", "rieltor"];
 

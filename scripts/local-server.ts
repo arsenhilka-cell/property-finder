@@ -3,7 +3,7 @@ import { Readable } from "node:stream";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
-import { handleApiRequest } from "../src/api.ts";
+import { handleApiRequest } from "../api/_app.ts";
 
 const publicDir = fileURLToPath(new URL("../public/", import.meta.url));
 const port = Number(process.env.PORT || 3000);
