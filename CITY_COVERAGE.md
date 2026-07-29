@@ -27,10 +27,10 @@
 | Кировоградская | Кропивницкий | kropyvnytskyi | verified | needs_review | verified | 2026-07-29 | OLX: canonical после redirect и карточки — Кропивницкий; RIELTOR: чистая выдача; DIM.RIA candidate 404 |
 | Хмельницкая | Хмельницкий | khmelnytskyi | verified | needs_review | needs_review | 2026-07-29 | OLX: 200 без redirect, карточки — Хмельницкий; DIM.RIA candidate 404, RIELTOR candidate вернул Киев |
 | Днепропетровская | Кривой Рог | kryvyi-rih | needs_review | needs_review | needs_review | — | Все проверенные candidates: OLX/DIM.RIA 404, RIELTOR вернул Киев |
-| Днепропетровская | Каменское | kamianske | needs_review | needs_review | needs_review | — | Крупный город |
-| Полтавская | Кременчуг | kremenchuk | needs_review | needs_review | needs_review | — | Крупный город |
+| Днепропетровская | Каменское | kamianske | verified | needs_review | needs_review | 2026-07-29 | OLX: canonical после redirect и первые 20 карточек — Каменское; DIM.RIA 404, RIELTOR candidate вернул Киев |
+| Полтавская | Кременчуг | kremenchuk | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, все карточки — Кременчуг; RIELTOR candidate вернул Киев |
 | Киевская | Белая Церковь | bila-tserkva | verified | needs_review | needs_review | 2026-07-29 | OLX: карточки подтверждены |
-| Киевская | Бровары | brovary | verified | needs_review | verified | 2026-07-29 | OLX/RIELTOR: карточки подтверждены |
+| Киевская | Бровары | brovary | verified | partial | verified | 2026-07-29 | OLX/RIELTOR: карточки подтверждены; DIM.RIA canonical: 19/20 Бровары, 1 Киев — mapping не активирован |
 | Днепропетровская | Павлоград | pavlohrad | needs_review | needs_review | needs_review | — | Пороговый размер, проверять отдельно |
 | Донецкая | Донецк | donetsk | unsupported | unsupported | unsupported | — | Нет mapping |
 | Донецкая | Мариуполь | mariupol | unsupported | unsupported | unsupported | — | Нет mapping |
@@ -49,5 +49,5 @@
 ## Сводка
 
 - Всего крупных городов в справочнике: 41.
-- Verified OLX: 24; DIM.RIA: 20; RIELTOR: 11.
-- Partial: 1; unsupported: 27; needs_review: 40 source mappings.
+- Verified OLX: 26; DIM.RIA: 21; RIELTOR: 11.
+- Partial: 2; unsupported: 27; needs_review: 36 source mappings.
