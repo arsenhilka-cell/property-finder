@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Коммерческая недвижимость</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <aside class="filters">
+        <h1>Коммерческая недвижимость</h1>
+        <p class="muted">Поиск по объявлениям Украины</p>
+        <form id="search-form">
+          <label>Город <input name="city" value="Одесса" required /></label>
+          <label>Операция
+            <select name="operation"><option value="rent">Аренда</option><option value="sale">Продажа</option></select>
+          </label>
+          <div class="field-pair"><label>Цена от <input type="number" name="minPrice" min="0" placeholder="грн" /></label><label>Цена до <input type="number" name="maxPrice" min="0" value="60000" placeholder="грн" /></label></div>
+          <div class="field-pair"><label>Площадь от <input type="number" name="minArea" min="0" value="30" placeholder="м²" /></label><label>Площадь до <input type="number" name="maxArea" min="0" value="100" placeholder="м²" /></label></div>
+          <fieldset><legend>Источники</legend><label class="check"><input type="checkbox" name="sources" value="olx" checked /> OLX</label><label class="check"><input type="checkbox" name="sources" value="dimria" checked /> DIM.RIA</label><label class="check"><input type="checkbox" name="sources" value="rieltor" checked /> RIELTOR</label></fieldset>
+          <button type="submit">Найти</button>
+        </form>
+      </aside>
+      <section class="results">
+        <div class="results-top"><div><h2>Объявления</h2><p id="summary" class="muted">Укажите параметры и начните поиск.</p></div><label class="sort-label">Сортировка<select id="sort"><option value="newest">Сначала новые</option><option value="price-asc">Цена: по возрастанию</option><option value="price-desc">Цена: по убыванию</option><option value="area-asc">Площадь: по возрастанию</option><option value="area-desc">Площадь: по убыванию</option></select></label></div>
+        <div id="source-counts" class="source-counts"></div>
+        <div id="notice" role="status"></div>
+        <div id="cards" class="cards"></div>
+        <nav id="pagination" class="pagination" aria-label="Сторінки результатів"></nav>
+      </section>
+    </main>
+    <template id="card-template"><article class="card"><img class="photo" alt="" /><div class="card-content"><div class="card-main"><span class="source"></span><h3></h3><p class="location"></p><p class="published"></p></div><div class="card-meta"><strong class="price"></strong><span class="area"></span><span class="ppm"></span><button class="sheets" type="button">В таблицу</button><button class="telegram" type="button">В Telegram</button><a class="open" target="_blank" rel="noreferrer">Открыть объявление</a></div></div></article></template>
+    <dialog id="send-dialog"><form id="send-form" method="dialog"><header><h2 id="send-title">Отправить в Telegram</h2><button class="icon-close" type="button" aria-label="Закрыть">×</button></header><label>Комментарий<textarea name="comment" rows="5" placeholder="Добавьте комментарий к объявлению"></textarea></label><div class="modal-actions"><button class="secondary" type="button" data-cancel>Отмена</button><button id="send-submit" type="submit">Отправить</button></div></form></dialog>
+    <script src="/app.js"></script>
+  </body>
+</html>

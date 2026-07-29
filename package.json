@@ -1,0 +1,16 @@
+{
+  "name": "uk-commercial-realty-source-probe",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:olx": "node --experimental-strip-types src/test-source.ts olx",
+    "test:dimria": "node --experimental-strip-types src/test-source.ts dimria",
+    "test:rieltor": "node --experimental-strip-types src/test-source.ts rieltor",
+    "test:all": "node --experimental-strip-types src/test-source.ts all",
+    "search:test": "node --experimental-strip-types src/search-test.ts",
+    "diagnose:olx": "node --experimental-strip-types src/olx-diagnostic.ts",
+    "test:olx:full": "node --experimental-strip-types src/olx-full-test.ts",
+    "analyze:olx:saved": "node --experimental-strip-types src/olx-analyze-saved.ts",
+    "start": "node --env-file=.env --experimental-strip-types src/server.ts"
+  }
+}
