@@ -2,6 +2,7 @@ import { getCity, matchesRequestedCity } from "../api/_cities.js";
 import { olx } from "../api/_olx.js";
 import { dimria } from "../api/_dimria.js";
 import { rieltor } from "../api/_rieltor.js";
+import { searchSourceBatch } from "../api/_search.js";
 
 const adapters = [olx, dimria, rieltor];
 const cityIds = ["kyiv", "zaporizhzhia", "cherkasy"];
@@ -11,7 +12,8 @@ for (const adapter of adapters) {
   for (const cityId of cityIds) {
     const city = getCity(cityId);
     if (!city) throw new Error(`City registry is missing ${cityId}`);
-    const listings = await adapter.search({ city, operation: "rent", minArea: 30, maxArea: 100, maxPrice: 60_000, page: 1 });
+    const batch = await searchSourceBatch(adapter.source, { city, operation: "rent", minArea: 30, maxArea: 100, maxPrice: 60_000 }, 1, 1);
+    const listings = batch.listings;
     const incorrect = listings.filter(listing => matchesRequestedCity(listing, city, adapter.source) === false);
     if (incorrect.length) throw new Error(`${adapter.source}/${cityId}: received ${incorrect.length} listings from another city`);
     results.set(`${adapter.source}:${cityId}`, listings.slice(0, 20).map(listing => listing.listingUrl));

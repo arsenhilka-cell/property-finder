@@ -51,7 +51,7 @@ export function parseOlxSearchHtml(html: string, params: SearchParams): { listin
     const location = allText.match(/(?:Київ|Одеса|Харків|Дніпро|Запоріжжя|Львів|Вінниця|Полтава|Черкаси)[^\n]{0,90}/i)?.[0]?.trim();
     // Only the explicit location line belongs to this card. `allText` also
     // contains page navigation/footer text, which must never assign a city.
-    const actualCity = cityFromText(location || "");
+    const actualCity = cityFromText(location || allText);
     listings.push({ source: "olx", sourceId: /-(ID[\w-]+)\.html/i.exec(listingUrl)?.[1], title,
       price, currency: priceMatch?.[2], area, city: actualCity?.labelRu,
       location,

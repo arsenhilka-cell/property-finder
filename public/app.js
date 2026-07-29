@@ -88,7 +88,7 @@ function renderCityOptions() {
   const matches = cityCatalog.filter(city => cityMatches(city, cityQuery.value)).slice(0, 80);
   cityOptions.replaceChildren(...matches.map(city => {
     const option = document.createElement('button');
-    option.type = 'button'; option.className = 'city-option'; option.role = 'option'; option.textContent = city.labelRu;
+    option.type = 'button'; option.className = 'city-option'; option.role = 'option'; option.textContent = city.regionRu ? `${city.labelRu} — ${city.regionRu}` : city.labelRu;
     option.onclick = () => selectCity(city);
     return option;
   }));
