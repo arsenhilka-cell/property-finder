@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { extname, join, normalize } from "node:path";
+import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { searchListings, type SearchListingsParams } from "./search-listings.ts";
 import type { Listing, SourceName } from "./types.ts";
@@ -94,7 +94,7 @@ async function jsonBody(request: import("node:http").IncomingMessage): Promise<u
   return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
 }
 
-const server = createServer(async (request, response) => {
+export async function handleNodeRequest(request: import("node:http").IncomingMessage, response: import("node:http").ServerResponse): Promise<void> {
   try {
     if (request.method === "POST" && request.url === "/api/search") {
       const params = parseParams(await jsonBody(request));
@@ -135,6 +135,9 @@ const server = createServer(async (request, response) => {
     response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
     response.end(JSON.stringify({ error: message }));
   }
-});
+}
 
-server.listen(port, () => console.log(`Commercial realty MVP: http://localhost:${port}`));
+const isDirectExecution = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
+if (isDirectExecution) {
+  createServer(handleNodeRequest).listen(port, () => console.log(`Commercial realty MVP: http://localhost:${port}`));
+}

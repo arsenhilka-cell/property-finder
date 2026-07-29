@@ -2,6 +2,9 @@
   "name": "uk-commercial-realty-source-probe",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test:olx": "node --experimental-strip-types src/test-source.ts olx",
     "test:dimria": "node --experimental-strip-types src/test-source.ts dimria",

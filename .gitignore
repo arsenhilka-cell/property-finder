@@ -2,3 +2,4 @@
 node_modules/
 debug/
 .DS_Store
+.vercel/
