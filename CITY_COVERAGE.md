@@ -13,11 +13,11 @@
 | Винницкая | Винница | vinnytsia | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, первые 20 карточек — Винница; RIELTOR candidate вернул Киев |
 | Полтавская | Полтава | poltava | verified | verified | verified | 2026-07-29 | Все источники: 200 без redirect, первые карточки подтверждают Полтаву |
 | Черкасская | Черкассы | cherkasy | verified | verified | verified | 2026-07-29 | Областной центр |
-| Житомирская | Житомир | zhytomyr | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
-| Николаевская | Николаев | mykolaiv | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Житомирская | Житомир | zhytomyr | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Житомир; RIELTOR candidate вернул Киев |
+| Николаевская | Николаев | mykolaiv | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, известные локации карточек — Николаев; RIELTOR candidate вернул Киев |
 | Херсонская | Херсон | kherson | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
-| Черниговская | Чернигов | chernihiv | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
-| Сумская | Сумы | sumy | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Черниговская | Чернигов | chernihiv | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Чернигов; RIELTOR candidate вернул Киев |
+| Сумская | Сумы | sumy | verified | verified | verified | 2026-07-29 | Все источники: 200 без redirect, первые карточки подтверждают Сумы |
 | Черновицкая | Черновцы | chernivtsi | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
 | Закарпатская | Ужгород | uzhhorod | needs_review | needs_review | needs_review | — | Областной центр |
 | Ровенская | Ровно | rivne | needs_review | needs_review | needs_review | — | Областной центр |
@@ -49,5 +49,5 @@
 ## Сводка
 
 - Всего крупных городов в справочнике: 41.
-- Verified OLX: 11; DIM.RIA: 9; RIELTOR: 9.
-- Partial: 0; unsupported: 27; needs_review: 67 source mappings.
+- Verified OLX: 15; DIM.RIA: 13; RIELTOR: 10.
+- Partial: 0; unsupported: 27; needs_review: 58 source mappings.
