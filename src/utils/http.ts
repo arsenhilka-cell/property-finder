@@ -13,6 +13,7 @@ export function delay(ms: number): Promise<void> {
 export async function fetchText(url: string, label: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), HTTP_TIMEOUT_MS);
+  let hardTimeout: ReturnType<typeof setTimeout> | undefined;
   const request = fetch(url, {
     redirect: "follow",
     signal: controller.signal,
@@ -22,16 +23,23 @@ export async function fetchText(url: string, label: string): Promise<string> {
       "user-agent": "Mozilla/5.0 (compatible; CommercialRealtyMVPResearch/0.1; contact: local-research)",
     },
   });
-  const response = await Promise.race([
-    request,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`HTTP timeout after ${HTTP_TIMEOUT_MS}ms: ${url}`)), HTTP_TIMEOUT_MS + 100)),
-  ]).finally(() => clearTimeout(timeout));
+  const hardTimeoutPromise = new Promise<never>((_, reject) => {
+    hardTimeout = setTimeout(() => reject(new Error(`HTTP timeout after ${HTTP_TIMEOUT_MS}ms: ${url}`)), HTTP_TIMEOUT_MS + 100);
+  });
+  const response = await Promise.race([request, hardTimeoutPromise]).finally(() => {
+    clearTimeout(timeout);
+    if (hardTimeout) clearTimeout(hardTimeout);
+  });
   const body = await response.text();
   statuses.push({ url: response.url, status: response.status, redirected: response.redirected,
     contentType: response.headers.get("content-type"), bytes: Buffer.byteLength(body), at: new Date().toISOString() });
-  await mkdir(DEBUG_DIR, { recursive: true });
-  const ext = response.headers.get("content-type")?.includes("json") ? "json" : "html";
-  await writeFile(join(DEBUG_DIR.pathname, `${label}.${ext}`), body);
+  // Vercel's deployment filesystem is read-only. Debug captures are useful
+  // locally, but must never make a serverless invocation fail.
+  if (!process.env.VERCEL) {
+    await mkdir(DEBUG_DIR, { recursive: true });
+    const ext = response.headers.get("content-type")?.includes("json") ? "json" : "html";
+    await writeFile(join(DEBUG_DIR.pathname, `${label}.${ext}`), body);
+  }
   return body;
 }
 
