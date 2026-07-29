@@ -3,7 +3,7 @@ import { Readable } from "node:stream";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
-import { handleApiRequest } from "./api.ts";
+import { handleApiRequest } from "../src/api.ts";
 
 const publicDir = fileURLToPath(new URL("../public/", import.meta.url));
 const port = Number(process.env.PORT || 3000);
@@ -35,9 +35,9 @@ async function serveStatic(request: IncomingMessage, response: ServerResponse): 
   }
 }
 
-export async function handleNodeRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
+async function handleLocalRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
   if (request.url?.startsWith("/api/")) { await writeWebResponse(response, await handleApiRequest(toWebRequest(request))); return; }
   await serveStatic(request, response);
 }
 
-createServer(handleNodeRequest).listen(port, () => console.log(`Commercial realty MVP: http://localhost:${port}`));
+createServer(handleLocalRequest).listen(port, () => console.log(`Commercial realty MVP: http://localhost:${port}`));

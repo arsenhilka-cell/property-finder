@@ -14,6 +14,6 @@
     "diagnose:olx": "node --experimental-strip-types src/olx-diagnostic.ts",
     "test:olx:full": "node --experimental-strip-types src/olx-full-test.ts",
     "analyze:olx:saved": "node --experimental-strip-types src/olx-analyze-saved.ts",
-    "start": "node --env-file=.env --experimental-strip-types src/server.ts"
+    "start": "node --env-file=.env --experimental-strip-types scripts/local-server.ts"
   }
 }

@@ -70,7 +70,7 @@ npm start
 
 ## Деплой на Vercel
 
-Vercel автоматически обнаруживает catch-all функцию `api/[...path].ts` и направляет в неё все существующие API routes. Статические файлы из `public/` Vercel отдаёт без дополнительной конфигурации.
+Vercel автоматически обнаруживает catch-all функцию `api/[...path].ts` и направляет в неё все существующие API routes. Локальный `node:http` сервер находится в `scripts/local-server.ts` и не является частью serverless deployment. Статические файлы из `public/` Vercel отдаёт без дополнительной конфигурации.
 
 В настройках проекта Vercel добавьте те же Environment Variables, что перечислены в `.env.example`. Значения секретов не должны попадать в Git.
 
