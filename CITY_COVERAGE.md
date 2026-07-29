@@ -15,7 +15,7 @@
 | Черкасская | Черкассы | cherkasy | verified | verified | verified | 2026-07-29 | Областной центр |
 | Житомирская | Житомир | zhytomyr | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Житомир; RIELTOR candidate вернул Киев |
 | Николаевская | Николаев | mykolaiv | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, известные локации карточек — Николаев; RIELTOR candidate вернул Киев |
-| Херсонская | Херсон | kherson | needs_review | needs_review | needs_review | — | Mapping требует повторной проверки |
+| Херсонская | Херсон | kherson | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Херсон; RIELTOR: 200, но карточек нет |
 | Черниговская | Чернигов | chernihiv | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Чернигов; RIELTOR candidate вернул Киев |
 | Сумская | Сумы | sumy | verified | verified | verified | 2026-07-29 | Все источники: 200 без redirect, первые карточки подтверждают Сумы |
 | Черновицкая | Черновцы | chernivtsi | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Черновцы; RIELTOR candidate вернул Киев |
@@ -24,9 +24,9 @@
 | Волынская | Луцк | lutsk | verified | verified | partial | 2026-07-29 | OLX/DIM.RIA: чистая выдача; RIELTOR: 11/20 Луцк, остальные неидентифицированные пригородные карточки — mapping не активирован |
 | Ивано-Франковская | Ивано-Франковск | ivano-frankivsk | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Ивано-Франковск; RIELTOR candidate вернул Киев |
 | Тернопольская | Тернополь | ternopil | verified | verified | needs_review | 2026-07-29 | OLX/DIM.RIA: 200 без redirect, карточки — Тернополь; RIELTOR candidate вернул Киев |
-| Кировоградская | Кропивницкий | kropyvnytskyi | needs_review | needs_review | needs_review | — | Областной центр |
-| Хмельницкая | Хмельницкий | khmelnytskyi | needs_review | needs_review | needs_review | — | Областной центр |
-| Днепропетровская | Кривой Рог | kryvyi-rih | needs_review | needs_review | needs_review | — | Крупный город |
+| Кировоградская | Кропивницкий | kropyvnytskyi | verified | needs_review | verified | 2026-07-29 | OLX: canonical после redirect и карточки — Кропивницкий; RIELTOR: чистая выдача; DIM.RIA candidate 404 |
+| Хмельницкая | Хмельницкий | khmelnytskyi | verified | needs_review | needs_review | 2026-07-29 | OLX: 200 без redirect, карточки — Хмельницкий; DIM.RIA candidate 404, RIELTOR candidate вернул Киев |
+| Днепропетровская | Кривой Рог | kryvyi-rih | needs_review | needs_review | needs_review | — | Все проверенные candidates: OLX/DIM.RIA 404, RIELTOR вернул Киев |
 | Днепропетровская | Каменское | kamianske | needs_review | needs_review | needs_review | — | Крупный город |
 | Полтавская | Кременчуг | kremenchuk | needs_review | needs_review | needs_review | — | Крупный город |
 | Киевская | Белая Церковь | bila-tserkva | verified | needs_review | needs_review | 2026-07-29 | OLX: карточки подтверждены |
@@ -49,5 +49,5 @@
 ## Сводка
 
 - Всего крупных городов в справочнике: 41.
-- Verified OLX: 21; DIM.RIA: 19; RIELTOR: 10.
-- Partial: 1; unsupported: 27; needs_review: 45 source mappings.
+- Verified OLX: 24; DIM.RIA: 20; RIELTOR: 11.
+- Partial: 1; unsupported: 27; needs_review: 40 source mappings.
